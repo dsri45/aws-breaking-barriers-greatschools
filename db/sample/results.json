@@ -1,0 +1,103 @@
+{
+  "query": "Middle school in Woodstock with STEM and after-school care",
+  "criteria": [
+    { "key": "level", "label": "Middle school", "importance": "require" },
+    { "key": "location", "label": "Woodstock, GA · 10 mi", "importance": "require" },
+    { "key": "stem", "label": "STEM programs", "importance": "require" },
+    { "key": "after_school", "label": "After-school care to 6 pm", "importance": "require" },
+    { "key": "class_size", "label": "Small classes", "importance": "prefer" }
+  ],
+  "messages": [
+    { "role": "user", "text": "Middle school in Woodstock with STEM and after-school care" },
+    {
+      "role": "assistant",
+      "text": "Got it. You want a middle school near Woodstock with strong STEM and after-school care. One thing before I search:",
+      "highlights": ["middle school near Woodstock", "strong STEM", "after-school care"]
+    },
+    {
+      "role": "question",
+      "text": "Most programs nearby end at 5:00 pm. Is that workable?",
+      "hint": "This changes which schools rank first.",
+      "options": ["Yes, 5 pm works", "I need until 6 pm", "Not sure yet"],
+      "selected": "I need until 6 pm"
+    },
+    {
+      "role": "status",
+      "steps": [
+        { "state": "done", "text": "Checked STEM programs at 9 middle schools" },
+        { "state": "done", "text": "Checked after-school options until 6 pm" },
+        { "state": "flag", "text": "1 school has 2023 enrollment data, flagged" }
+      ]
+    },
+    {
+      "role": "assistant",
+      "text": "Here are 3 schools that fit. Oak Ridge is the strongest on STEM, but its care ends at 5 pm. Pine Hill covers you until 6:30 pm."
+    }
+  ],
+  "results": [
+    {
+      "school_id": "ga-10001",
+      "rank_label": "Best STEM match",
+      "name": "Oak Ridge Middle School",
+      "entity_type": "public",
+      "grades": "6-8",
+      "distance_mi": 1.8,
+      "summary_rating": 8,
+      "avg_review_rating": 4.4,
+      "review_count": 36,
+      "review_topic": "Teachers: mostly positive",
+      "why": "Good fit if STEM comes first: robotics club and an engineering elective",
+      "latlon": "34.1015, -84.5194",
+      "saved": true,
+      "criteria": [
+        { "key": "stem", "label": "STEM", "status": "confirmed", "evidence": "Robotics club, engineering elective, AP-track math", "as_of": "2026-07-15" },
+        { "key": "after_school", "label": "After-school", "status": "partial", "evidence": "Ends 5:00 pm; you need until 6:00 pm", "as_of": "2026-07-15" },
+        { "key": "class_size", "label": "Class size", "status": "missing", "evidence": "No class-size data published", "as_of": null }
+      ]
+    },
+    {
+      "school_id": "ga-10002",
+      "rank_label": "Best after-school match",
+      "name": "Pine Hill Academy",
+      "entity_type": "charter",
+      "grades": "6-8",
+      "distance_mi": 3.2,
+      "summary_rating": 7,
+      "avg_review_rating": 4.6,
+      "review_count": 21,
+      "review_topic": "Communication: positive",
+      "why": "Good fit if pickup time matters most: on-site care until 6:30 pm",
+      "latlon": "34.0812, -84.4871",
+      "saved": true,
+      "criteria": [
+        { "key": "after_school", "label": "After-school", "status": "confirmed", "evidence": "On-site program until 6:30 pm", "as_of": "2026-05-02" },
+        { "key": "stem", "label": "STEM", "status": "partial", "evidence": "One coding elective, no club", "as_of": "2026-05-02" },
+        { "key": "enrollment", "label": "Enrollment", "status": "needs_attention", "evidence": "Figures are from 2023 and may be out of date", "as_of": "2023-09-01" }
+      ]
+    },
+    {
+      "school_id": "ga-10003",
+      "rank_label": "Worth a look",
+      "name": "Riverbend Middle School",
+      "entity_type": "public",
+      "grades": "6-8",
+      "distance_mi": 4.5,
+      "summary_rating": null,
+      "avg_review_rating": 3.9,
+      "review_count": 12,
+      "review_topic": "Safety: mixed",
+      "why": "Good fit if you can wait: STEM magnet track planned for fall 2026",
+      "latlon": "34.1203, -84.5602",
+      "saved": false,
+      "criteria": [
+        { "key": "after_school", "label": "After-school", "status": "confirmed", "evidence": "YMCA program on campus until 6:00 pm", "as_of": "2026-03-10" },
+        { "key": "stem", "label": "STEM", "status": "needs_attention", "evidence": "Magnet track announced, not yet confirmed", "as_of": "2026-03-10" }
+      ]
+    }
+  ],
+  "nearby_unmatched": [
+    { "name": "Hillside Middle", "summary_rating": 5, "latlon": "34.1302, -84.5450" },
+    { "name": "Creekview Middle", "summary_rating": 6, "latlon": "34.0700, -84.5350" },
+    { "name": "Lakeside Middle", "summary_rating": 4, "latlon": "34.0650, -84.4800" }
+  ]
+}

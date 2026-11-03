@@ -249,6 +249,10 @@ GEM
       concurrent-ruby (~> 1.0)
     uri (1.1.2)
     useragent (0.16.11)
+    view_component (4.21.0)
+      actionview (>= 7.1.0)
+      activesupport (>= 7.1.0)
+      prism (>= 1.0)
     websocket-driver (0.8.2)
       base64
       websocket-extensions (>= 0.1.0)
@@ -277,6 +281,7 @@ DEPENDENCIES
   tailwindcss-rails (~> 4.0)
   trilogy (~> 2.0)
   turbo-rails
+  view_component (~> 4.0)
 
 RUBY VERSION
    ruby 3.4.8p72

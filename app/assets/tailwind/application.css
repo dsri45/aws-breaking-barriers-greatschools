@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+/* Guided Search palette (matches the hi-fi mockup). */
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-ink: #1A2433;
+  --color-ink-2: #3D4756;
+  --color-muted: #5B6675;
+  --color-line: #E1E5EA;
+  --color-line-2: #CBD2DA;
+  --color-ground: #F4F5F7;
+  --color-navy: #1F3B57;
+  --color-blue: #2F6FB0;
+  --color-blue-soft: #E8F0F9;
+  --color-pin: #4A86C5;
+  --color-good: #1E7F4E;
+  --color-warn: #B26A00;
+  --color-alert: #C2410C;
+  --color-nodata: #8A94A3;
+  --color-highlight: #DDEFE3;
+  --color-heart: #D64545;
+}
