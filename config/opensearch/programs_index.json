@@ -1,0 +1,108 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "knn": true
+    }
+  },
+  "mappings": {
+    "dynamic": true,
+    "dynamic_templates": [
+      {
+        "strings_as_keyword": {
+          "match_mapping_type": "string",
+          "mapping": { "type": "keyword", "ignore_above": 1024 }
+        }
+      }
+    ],
+    "properties": {
+      "id": { "type": "keyword" },
+      "program_id": { "type": "long" },
+
+      "name": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 512 } } },
+      "source_name": { "type": "keyword" },
+      "description": { "type": "text" },
+
+      "program_type": { "type": "keyword" },
+      "tag_names": { "type": "keyword" },
+      "level": { "type": "keyword" },
+      "level_code": { "type": "keyword" },
+
+      "age_min_search": { "type": "integer" },
+      "age_max_search": { "type": "integer" },
+      "age_display": { "type": "keyword" },
+      "all_ages": { "type": "boolean" },
+
+      "street": { "type": "keyword" },
+      "city": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "county": { "type": "keyword" },
+      "state": { "type": "keyword" },
+      "geo_state": { "type": "keyword" },
+      "FIPScounty": { "type": "keyword" },
+      "zipcode": { "type": "keyword" },
+      "zipcode2": { "type": "keyword" },
+      "address_type": { "type": "keyword" },
+
+      "latlon": { "type": "keyword" },
+      "location": { "type": "geo_point" },
+
+      "has_available_registration": { "type": "boolean" },
+      "active_instance_count": { "type": "integer" },
+      "upcoming_instance_count": { "type": "integer" },
+      "organization_count": { "type": "integer" },
+      "next_start_date": { "type": "date", "format": "strict_date_optional_time||yyyy-MM-dd||epoch_millis" },
+
+      "instances": {
+        "type": "nested",
+        "properties": {
+          "id": { "type": "long" },
+          "status": { "type": "keyword" },
+          "active": { "type": "boolean" },
+          "start_date": { "type": "date", "format": "strict_date_optional_time||yyyy-MM-dd||epoch_millis" },
+          "end_date": { "type": "date", "format": "strict_date_optional_time||yyyy-MM-dd||epoch_millis" },
+          "start_time": { "type": "date", "format": "strict_date_optional_time||yyyy-MM-dd||epoch_millis" },
+          "end_time": { "type": "date", "format": "strict_date_optional_time||yyyy-MM-dd||epoch_millis" },
+          "description": { "type": "text" },
+          "url": { "type": "keyword" },
+          "tags": {
+            "type": "nested",
+            "properties": {
+              "id": { "type": "long" },
+              "name": { "type": "keyword" }
+            }
+          }
+        }
+      },
+
+      "organizations": {
+        "type": "nested",
+        "properties": {
+          "organization_id": { "type": "long" },
+          "name": { "type": "keyword" },
+          "source_name": { "type": "keyword" },
+          "street": { "type": "keyword" },
+          "city": { "type": "keyword" },
+          "county": { "type": "keyword" },
+          "state": { "type": "keyword" },
+          "zipcode": { "type": "keyword" },
+          "phone": { "type": "keyword" },
+          "home_page_url": { "type": "keyword" },
+          "latlon": { "type": "keyword" },
+          "location": { "type": "geo_point" }
+        }
+      },
+
+      "embedding": {
+        "type": "knn_vector",
+        "dimension": 1024,
+        "method": {
+          "name": "hnsw",
+          "space_type": "cosinesimil",
+          "engine": "lucene",
+          "parameters": { "ef_construction": 128, "m": 16 }
+        }
+      }
+    }
+  }
+}

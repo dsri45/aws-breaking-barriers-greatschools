@@ -1,0 +1,149 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "knn": true
+    }
+  },
+  "mappings": {
+    "dynamic": true,
+    "dynamic_templates": [
+      {
+        "strings_as_keyword": {
+          "match_mapping_type": "string",
+          "mapping": { "type": "keyword", "ignore_above": 1024 }
+        }
+      }
+    ],
+    "properties": {
+      "id": { "type": "keyword" },
+      "school_id": { "type": "long" },
+      "document_type": { "type": "keyword" },
+
+      "name": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 512 } } },
+      "sortable_name": { "type": "keyword" },
+
+      "entity_type": { "type": "keyword" },
+      "level_codes": { "type": "keyword" },
+
+      "street": { "type": "keyword" },
+      "city": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+      "city_untokenized": { "type": "keyword" },
+      "state": { "type": "keyword" },
+      "county": { "type": "keyword" },
+      "zipcode": { "type": "keyword" },
+      "school_district_id": { "type": "keyword" },
+      "school_district_name": { "type": "keyword" },
+      "school_district_city": { "type": "keyword" },
+
+      "latlon": { "type": "keyword" },
+      "location": { "type": "geo_point" },
+
+      "summary_rating": { "type": "integer" },
+      "test_scores_rating": { "type": "integer" },
+      "student_progress_rating": { "type": "integer" },
+      "college_readiness_rating": { "type": "integer" },
+      "low_income_rating": { "type": "integer" },
+      "equity_indicator": { "type": "boolean" },
+      "swd_test_scores_rating": { "type": "integer" },
+      "avg_review_rating": { "type": "float" },
+
+      "enrollment": { "type": "integer" },
+      "student_teacher_ratio": { "type": "float" },
+      "attendance_rate": { "type": "float" },
+      "graduation_rate": { "type": "float" },
+
+      "gifted_talented": { "type": "boolean" },
+      "ap_courses": { "type": "keyword" },
+
+      "osp": {
+        "type": "object",
+        "properties": {
+          "transportation": { "type": "keyword" },
+          "arts_visual": { "type": "keyword" },
+          "boarding": { "type": "keyword" },
+          "coed": { "type": "keyword" },
+          "dress_code": { "type": "keyword" },
+          "facebook_url": { "type": "keyword" }
+        }
+      },
+
+      "high_attendance": {
+        "type": "object",
+        "properties": {
+          "comparator": { "type": "keyword" },
+          "tier": { "type": "keyword" },
+          "trend": { "type": "keyword" },
+          "qualifies": { "type": "boolean" },
+          "confidence": { "type": "keyword" },
+          "source_generated_at": { "type": "date", "format": "strict_date_optional_time||yyyy-MM-dd||epoch_millis" }
+        }
+      },
+      "class_size": {
+        "type": "object",
+        "properties": {
+          "comparator": { "type": "keyword" },
+          "tier": { "type": "keyword" },
+          "qualifies": { "type": "boolean" },
+          "confidence": { "type": "keyword" },
+          "source_generated_at": { "type": "date", "format": "strict_date_optional_time||yyyy-MM-dd||epoch_millis" }
+        }
+      },
+      "career_prep": {
+        "type": "object",
+        "properties": {
+          "comparator": { "type": "keyword" },
+          "tier": { "type": "keyword" },
+          "qualifies": { "type": "boolean" },
+          "confidence": { "type": "keyword" },
+          "source_generated_at": { "type": "date", "format": "strict_date_optional_time||yyyy-MM-dd||epoch_millis" }
+        }
+      },
+
+      "reviews_text": { "type": "text" },
+      "reviews_positive": { "type": "text" },
+      "reviews_negative": { "type": "text" },
+
+      "reviews_full": {
+        "type": "nested",
+        "properties": {
+          "text": { "type": "text" },
+          "overall_rating": { "type": "float" },
+          "created_date": { "type": "date", "format": "strict_date_optional_time||yyyy-MM-dd||epoch_millis" },
+          "sentiments": {
+            "type": "nested",
+            "properties": {
+              "topic": { "type": "keyword" },
+              "sentiment_enum": { "type": "keyword" },
+              "sentiment_polarity": { "type": "float" }
+            }
+          }
+        }
+      },
+
+      "sentiment_stats": {
+        "type": "object",
+        "properties": {
+          "total_reviews": { "type": "integer" },
+          "total_sentiment_count": { "type": "integer" },
+          "positive_sentiment_count": { "type": "integer" },
+          "negative_sentiment_count": { "type": "integer" },
+          "neutral_sentiment_count": { "type": "integer" },
+          "sentiment_by_topic": { "type": "object", "enabled": false }
+        }
+      },
+
+      "embedding": {
+        "type": "knn_vector",
+        "dimension": 1024,
+        "method": {
+          "name": "hnsw",
+          "space_type": "cosinesimil",
+          "engine": "lucene",
+          "parameters": { "ef_construction": 128, "m": 16 }
+        }
+      }
+    }
+  }
+}
