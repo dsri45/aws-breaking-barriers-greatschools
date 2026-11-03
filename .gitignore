@@ -1,0 +1,27 @@
+# Ruby on Rails
+/.bundle/
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+/storage/*
+!/storage/.keep
+/public/assets
+/node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+/config/master.key
+/config/credentials/*.key
+*.pem
+
+# AWS credentials
+.aws/
+cdk.context.json
+
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/
