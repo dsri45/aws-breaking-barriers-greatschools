@@ -1,0 +1,40 @@
+<section aria-label="Map of results" class="relative w-[380px] shrink-0 overflow-hidden border-l border-line bg-[#ECEFF1]">
+  <svg width="380" height="720" viewBox="0 0 380 720" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map with school rating pins">
+    <rect width="380" height="720" fill="#ECEFF1"/>
+    <path d="M0 600 C80 580 120 640 200 630 C280 620 330 680 420 670 L420 720 L0 720 Z" fill="#C7DCEC"/>
+    <rect x="250" y="80" width="120" height="90" fill="#D3E6CD"/><rect x="30" y="380" width="90" height="70" fill="#D3E6CD"/>
+    <g stroke="#fff" stroke-width="4" fill="none"><path d="M0 140H420M0 250H420M0 500H420M70 0V600M180 0V620M330 0V600"/></g>
+    <path d="M0 420 C150 400 260 440 420 400" stroke="#D5DBE1" stroke-width="14" fill="none"/>
+    <path d="M0 420 C150 400 260 440 420 400" stroke="#F7E3A6" stroke-width="10" fill="none"/>
+    <% points.each do |pt| %>
+      <% case pt.pin.kind %>
+      <% when :selected %>
+        <g><circle cx="<%= pt.x %>" cy="<%= pt.y %>" r="38" fill="#1F3B57" opacity="0.15"/>
+          <path d="M<%= pt.x %> <%= pt.y + 28 %> l-11 16 h22 z" fill="#1F3B57"/>
+          <circle cx="<%= pt.x %>" cy="<%= pt.y %>" r="28" fill="#1F3B57" stroke="#fff" stroke-width="3"/>
+          <text x="<%= pt.x %>" y="<%= pt.y + 6 %>" text-anchor="middle" font-size="18" font-weight="700" fill="#fff"><%= label(pt.pin) %></text></g>
+      <% when :match %>
+        <g><path d="M<%= pt.x %> <%= pt.y + 20 %> l-9 14 h18 z" fill="<%= pt.pin.rating ? "#4A86C5" : "#fff" %>"/>
+          <circle cx="<%= pt.x %>" cy="<%= pt.y %>" r="22" fill="<%= pt.pin.rating ? "#4A86C5" : "#fff" %>" stroke="<%= pt.pin.rating ? "#fff" : "#8A94A3" %>" stroke-width="3"<%= pt.pin.rating ? "" : ' stroke-dasharray="4 3"'.html_safe %>/>
+          <text x="<%= pt.x %>" y="<%= pt.y + 5 %>" text-anchor="middle" font-size="15" font-weight="700" fill="<%= pt.pin.rating ? "#fff" : "#5B6675" %>"><%= label(pt.pin) %></text></g>
+      <% else %>
+        <g opacity="0.75"><circle cx="<%= pt.x %>" cy="<%= pt.y %>" r="15" fill="#fff" stroke="#8A94A3" stroke-width="1.5"/>
+          <text x="<%= pt.x %>" y="<%= pt.y + 4 %>" text-anchor="middle" font-size="11" font-weight="700" fill="#5B6675"><%= label(pt.pin) %></text></g>
+      <% end %>
+    <% end %>
+  </svg>
+
+  <div class="absolute left-4 top-4 flex gap-2">
+    <button type="button" class="h-[34px] rounded-lg border border-line-2 bg-white px-3 text-[13px] font-semibold text-navy" aria-pressed="true">Map</button>
+    <button type="button" class="h-[34px] rounded-lg border border-line-2 bg-white px-3 text-[13px] text-ink-2" aria-pressed="false">Satellite</button>
+  </div>
+  <div class="absolute right-4 top-4 flex flex-col overflow-hidden rounded-lg border border-line-2 bg-white">
+    <button type="button" aria-label="Zoom in" class="size-9 border-b border-line text-xl">+</button>
+    <button type="button" aria-label="Zoom out" class="size-9 text-xl">−</button>
+  </div>
+  <div class="absolute inset-x-4 bottom-4 flex items-center gap-3.5 rounded-[10px] bg-white/95 px-3 py-2.5 text-xs whitespace-nowrap text-ink-2">
+    <span class="flex items-center gap-1.5"><span class="size-3 rounded-full bg-navy"></span>Selected</span>
+    <span class="flex items-center gap-1.5"><span class="size-3 rounded-full bg-pin"></span>Match</span>
+    <span class="flex items-center gap-1.5"><span class="size-3 rounded-full border-[1.5px] border-nodata bg-white"></span>Other schools</span>
+  </div>
+</section>
