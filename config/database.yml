@@ -1,0 +1,23 @@
+default: &default
+  adapter: trilogy
+  encoding: utf8mb4
+  connect_timeout: 5
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+  host: <%= ENV.fetch("DB_HOST", "127.0.0.1").to_json %>
+  port: <%= ENV.fetch("DB_PORT", 3306) %>
+  username: <%= ENV.fetch("DB_USERNAME", "root").to_json %>
+  password: <%= ENV.fetch("DB_PASSWORD", "").to_json %>
+
+development:
+  <<: *default
+  database: greatschools_development
+
+test:
+  <<: *default
+  database: greatschools_test
+
+production:
+  <<: *default
+  database: greatschools_production
+  ssl_mode: VERIFY_IDENTITY
+  ssl_ca: <%= ENV.fetch("DB_SSL_CA", "/etc/pki/tls/certs/rds-global-bundle.pem").to_json %>

@@ -25,3 +25,11 @@ cdk.context.json
 .DS_Store
 .idea/
 .vscode/
+
+# Dependency and infrastructure build output
+/vendor/bundle/
+/app/assets/builds/*
+!/app/assets/builds/.keep
+/infra/node_modules/
+/infra/cdk.out/
+/infra/dist/

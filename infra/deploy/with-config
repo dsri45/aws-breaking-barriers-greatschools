@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd /opt/greatschools
+set -a
+source /etc/greatschools/config
+set +a
+export RAILS_ENV=production BUNDLE_PATH=/opt/greatschools/vendor/bundle BUNDLE_FROZEN=true
+
+db_secret=$(aws secretsmanager get-secret-value --secret-id "$DB_SECRET_ID" --query SecretString --output text)
+DB_USERNAME=$(jq -er '.username' <<< "$db_secret")
+DB_PASSWORD=$(jq -er '.password' <<< "$db_secret")
+SECRET_KEY_BASE=$(aws ssm get-parameter --name "$SECRET_KEY_BASE_PARAMETER" \
+  --with-decryption --query Parameter.Value --output text)
+unset db_secret
+export DB_USERNAME DB_PASSWORD SECRET_KEY_BASE
+
+if [[ "${1:-}" == "serve" ]]; then
+  bin/rails db:migrate
+  exec ruby3.4-bundle exec puma -C config/puma.rb
+fi
+exec "$@"

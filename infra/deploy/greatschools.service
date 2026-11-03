@@ -1,0 +1,18 @@
+[Unit]
+Description=GreatSchools Rails (Puma)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+User=greatschools
+Group=greatschools
+WorkingDirectory=/opt/greatschools
+ExecStart=/usr/local/bin/greatschools-run serve
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/greatschools/rails.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

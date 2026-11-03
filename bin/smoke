@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+base_url=${1:-http://127.0.0.1:3000}
+base_url=${base_url%/}
+cookie_jar=$(mktemp)
+trap 'rm -f "$cookie_jar"' EXIT
+
+curl -fsS "$base_url/up" >/dev/null
+curl -fsS "$base_url/ready" | jq -e '.status == "ready"' >/dev/null
+echo "Rails and MySQL are ready"
+
+session=$(curl -fsS -c "$cookie_jar" "$base_url/api/session")
+csrf=$(jq -er '.csrf_token' <<< "$session")
+request=(curl -fsS -b "$cookie_jar" -H "Origin: $base_url" -H "X-CSRF-Token: $csrf")
+turn=$("${request[@]}" -H 'Content-Type: application/json' \
+  -d '{"message":"Looking for a middle school in Woodstock with STEM"}' "$base_url/api/search")
+school_id=$(jq -er '.results[] | select(.id == "demo-woodstock-stem") | .id' <<< "$turn")
+jq -e '.reply != "" and (.follow_up_questions | length > 0)' <<< "$turn" >/dev/null
+echo "Guided search returned a clarifying question and the synthetic school"
+
+"${request[@]}" -H 'Content-Type: application/json' \
+  -d "$(jq -cn --arg id "$school_id" '{school_id: $id}')" "$base_url/api/shortlist" >/dev/null
+curl -fsS -b "$cookie_jar" "$base_url/api/session" |
+  jq -e --arg id "$school_id" '(.history | length == 2) and .shortlist[0].id == $id' >/dev/null
+
+"${request[@]}" -X DELETE "$base_url/api/shortlist/$school_id" >/dev/null
+curl -fsS -b "$cookie_jar" "$base_url/api/session" |
+  jq -e '.shortlist == []' >/dev/null
+echo "The same browser session can save, reload, and remove a school"
