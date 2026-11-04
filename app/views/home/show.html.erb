@@ -27,8 +27,7 @@
         <div class="inline-flex items-center gap-1">
         <%= button_to search_options_path, params: { change: "toggle", key: criterion.key },
               form: { data: { turbo_frame: "guided-search" } },
-              class: style, aria: { pressed: required }, title: required ? "Make this nice to have" : "Make this a must-have" do %>
-          <span class="search-priority-importance rounded-md bg-ground px-1.5 text-[11px] font-bold"><%= required ? "MUST" : "NICE" %></span>
+              class: style, aria: { pressed: required }, title: required ? "Use for ranking" : "Use as a filter" do %>
           <%= criterion.label %>
         <% end %>
         <%= button_to "×", search_options_path, params: { change: "remove", key: criterion.key },
@@ -62,7 +61,6 @@
           <%= f.submit "+ Add priority", class: "h-[34px] rounded-full border border-dashed border-line-2 bg-white px-3 text-sm font-medium" %>
         <% end %>
       <% end %>
-      <span class="text-[13px] text-muted">Program requests always need evidence · MUST filters · NICE ranks</span>
     <% elsif @show_preview %>
       <span class="text-[13px] text-muted">No preferences selected yet. Tell your guide what matters.</span>
     <% end %>
@@ -144,6 +142,17 @@
               <% school = @search.schools.first %>
               <%= render "guide_action", label: "Questions for a school visit", message: "What should I ask on a visit to #{school.name}?", intent: "visit_questions", school_id: school.school_id, view: ("shortlist" if @show_shortlist) %>
               <button type="button" class="guide-action" data-action="chat-prompts#priorities">Adjust my priorities</button>
+              <% if @search.schools.size >= 2 %>
+                <%= link_to "Compare the first two schools", compare_schools_path(ids: @search.schools.first(2).map(&:school_id), view: ("shortlist" if @show_shortlist)),
+                      class: "guide-action", data: { turbo_frame: "_top" } %>
+              <% end %>
+              <span class="w-full text-xs text-muted">More about <%= school.name %></span>
+              <%= link_to "Explore clubs & programs", school_profile_path(school.school_id, view: ("shortlist" if @show_shortlist), anchor: "courses-activities"),
+                    class: "guide-action", data: { turbo_frame: "_top" } %>
+              <%= link_to "See student support", school_profile_path(school.school_id, view: ("shortlist" if @show_shortlist), anchor: "student-support"),
+                    class: "guide-action", data: { turbo_frame: "_top" } %>
+              <%= link_to "Read family reviews", school_profile_path(school.school_id, view: ("shortlist" if @show_shortlist), anchor: "reviews"),
+                    class: "guide-action", data: { turbo_frame: "_top" } %>
             </div>
           <% elsif @guide_questions.empty? && @editable_priorities %>
             <div class="guide-next">
@@ -212,7 +221,7 @@
             <% elsif @show_preview %>
               Start with your location, your child's grade, and what matters to your family. Schools with confirmed evidence will appear here.
             <% elsif @can_refresh && GuidedSearch::EvidenceScorer.required_keys(@guide_preferences["criteria"]).any? %>
-              No schools have published evidence for all requested programs and must-have priorities. Try another location or change your priorities.
+              No schools have published evidence for all requested programs and selected priorities. Try another location or change your priorities.
             <% else %>
               No school results for this turn.
             <% end %>

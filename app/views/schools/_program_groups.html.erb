@@ -1,0 +1,19 @@
+<div class="profile-two-columns">
+  <% groups.each do |label, entries| %>
+    <div class="profile-card">
+      <h3><%= label %></h3>
+      <% if entries.any? %>
+        <p class="profile-muted"><%= pluralize(entries.size, "published offering") %></p>
+        <ul class="profile-programs"><% entries.first(6).each do |entry| %><li><%= entry %></li><% end %></ul>
+        <% if entries.size > 6 %>
+          <details class="profile-disclosure">
+            <summary>Show all <%= entries.size %> <%= label.downcase %> offerings</summary>
+            <ul class="profile-programs"><% entries.drop(6).each do |entry| %><li><%= entry %></li><% end %></ul>
+          </details>
+        <% end %>
+      <% else %>
+        <p class="profile-muted">No published <%= label.downcase %> information.</p>
+      <% end %>
+    </div>
+  <% end %>
+</div>

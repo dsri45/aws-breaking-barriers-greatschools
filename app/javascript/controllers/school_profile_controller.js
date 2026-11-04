@@ -17,7 +17,7 @@ export default class extends Controller {
   }
 
   disconnect() {
-    this.observer.disconnect()
+    this.observer?.disconnect()
   }
 
   select(event) {
@@ -26,8 +26,20 @@ export default class extends Controller {
 
   activate(hash) {
     for (const link of this.navLinkTargets) {
-      if (link.hash === hash) link.setAttribute("aria-current", "location")
-      else link.removeAttribute("aria-current")
+      if (link.hash === hash) {
+        link.setAttribute("aria-current", "location")
+        this.revealNavLink(link)
+      } else link.removeAttribute("aria-current")
     }
+  }
+
+  revealNavLink(link) {
+    const scroller = link.parentElement
+    const bounds = scroller.getBoundingClientRect()
+    const target = link.getBoundingClientRect()
+    const delta = target.left < bounds.left ? target.left - bounds.left - 12
+      : target.right > bounds.right ? target.right - bounds.right + 12 : 0
+    if (delta) scroller.scrollBy({ left: delta,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" })
   }
 }

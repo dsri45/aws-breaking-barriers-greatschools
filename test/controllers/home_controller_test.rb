@@ -219,27 +219,27 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "section[aria-label='Map of results'] svg text", 1
 
     form = css_select("form[action^='/search-options']").find { |node| node.at_css("input[value='toggle']") }
-    assert_select "button[aria-pressed='true']", text: /MUST.*Highly rated/m
+    assert_select "button[aria-pressed='true']", text: /Highly rated/
     post search_options_path, params: { change: "toggle", key: "rating", authenticity_token: token_for(form) }
     follow_redirect!
-    assert_select "button[aria-pressed='false']", text: /NICE.*Highly rated/m
+    assert_select "button[aria-pressed='false']", text: /Highly rated/
     assert_select "#results article", 2
 
     add_form = css_select("form[action^='/search-options']").find { |node| node.at_css("input[value='add']") }
     post search_options_path, params: { change: "add", need: "Sports programs", authenticity_token: token_for(add_form) }
     follow_redirect!
-    assert_select "button[aria-pressed='true']", text: /MUST.*Sports programs/m
+    assert_select "button[aria-pressed='true']", text: /Sports programs/
     assert_select "#results article", 0
 
     post search_options_path, params: { change: "toggle", key: "sports_programs", authenticity_token: token_for(add_form) }
     follow_redirect!
-    assert_select "button[aria-pressed='false']", text: /NICE.*Sports programs/m
+    assert_select "button[aria-pressed='false']", text: /Sports programs/
     assert_select "#results article", 0
 
     refresh_form = css_select("form[action^='/search-options']").find { |node| node.at_css("input[value='refresh']") }
     post search_options_path, params: { change: "refresh", authenticity_token: token_for(refresh_form) }
     follow_redirect!
-    assert_select "button[aria-pressed='false']", text: /NICE.*Sports programs/m
+    assert_select "button[aria-pressed='false']", text: /Sports programs/
 
     remove_form = css_select("form[action^='/search-options']").find { |node| node.at_css("input[value='remove']") }
     post remove_form["action"], params: { change: "remove", key: "sports_programs", authenticity_token: token_for(remove_form) }
@@ -282,7 +282,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     post search_options_path, params: { change: "add", need: "IB offered", authenticity_token: token_for(add_form) }
     follow_redirect!
     assert_select "#results article", 0
-    assert_select "button[aria-pressed='true']", text: /MUST.*IB offered/m
+    assert_select "button[aria-pressed='true']", text: /IB offered/
     assert_equal "m", SearchSession.sole.preferences.dig("filters", "level_codes")
     assert_equal "require", SearchSession.sole.preferences.dig("priority_overrides", "ib")
   ensure
@@ -330,6 +330,44 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path(chat_id: SearchSession.sole.id)
     get school_profile_path("unknown")
     assert_response :not_found
+  end
+
+  test "school profiles expose support, admissions, school details and all published offerings" do
+    get api_search_session_path
+    school = SchoolProfile.seed_schools.fetch("School fl-96528")
+    SearchSession.sole.update!(history: [{ "role" => "assistant", "content" => "One school." }], results: [{
+      "school_id" => school["id"], "name" => school["name"], "grades" => "PK, K–12", "entity_type" => "charter",
+      "summary_rating" => school["summary_rating"], "criteria" => [],
+      "profile" => { "osp" => { "school_phone" => ["850-555-0100"] } }
+    }])
+    get school_profile_path(school["id"])
+    assert_response :success
+    assert_select ".profile-section-nav a[href='#student-support']", text: "Student support"
+    assert_select "#student-support", text: /Mental health supports.*Mental health specialists.*Family engagement.*Parent-teacher conferences/m
+    assert_select "#from-school", text: /850-555-0100.*See all school info.*850-555-0116.*Start time.*8:00 AM.*Schedule.*Traditional/m
+    assert_select "#enrollment time[datetime='2050-01-01']", text: "January 1, 2050"
+    assert_select "#enrollment", text: /Requirements.*Application/m
+    assert_select "#courses-activities", text: /Book \/ reading club.*College preparation.*College guidance.*Career exploration/m
+    assert_select "#courses-activities details summary", text: /Show all 11 academic clubs offerings/
+    assert_select "#reviews details summary", text: "Review topics & sentiment"
+    assert_select "#reviews table th", text: "Teachers / Staff"
+    assert_select "#academics", text: /10-point scale/
+    assert_select "a[href^='javascript:']", 0
+  end
+
+  test "a sparse school profile shows missing data clearly without invented percentages or stars" do
+    get api_search_session_path
+    SearchSession.sole.update!(history: [{ "role" => "assistant", "content" => "One school." }], results: [{
+      "school_id" => "no-data", "name" => "Sparse School", "criteria" => [],
+      "profile" => { "osp" => { "application_deadline_date" => ["2022-02-28"] } }
+    }])
+    get school_profile_path("no-data")
+    assert_response :success
+    assert_select "#student-support", text: /English learning support information is not provided.*No published mental health supports information/m
+    assert_select "#enrollment", text: /Past deadline.*Not provided/m
+    assert_select "#academics", text: /Academic ratings are not provided/
+    assert_select "#academics .profile-details", 0
+    assert_select "#reviews .profile-review-topics", 0
   end
 
   test "inline school actions explain evidence without changing search preferences" do

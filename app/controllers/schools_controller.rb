@@ -5,7 +5,7 @@ class SchoolsController < ApplicationController
     @school = @available_schools.find { |school| school.school_id == params[:school_id] }
     return head :not_found unless @school
 
-    @profile = SchoolProfile.for(@school)
+    @profile = SchoolProfile.for(@school, refresh: true)
     @related_schools = @available_schools.reject { |school| school.school_id == @school.school_id }
   end
 

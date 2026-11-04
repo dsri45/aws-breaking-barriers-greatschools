@@ -14,7 +14,7 @@
       <div class="profile-title-row">
         <h1><%= @school.name %></h1>
         <div class="profile-actions">
-          <%= link_to "Reviews", "#reviews", class: "profile-button" %>
+          <%= link_to "Reviews", "#reviews", class: "profile-button", data: { turbo: false } %>
           <% if @allow_saving %>
             <% saved = @school.saved %>
             <%= button_to saved ? api_shortlist_path(@school.school_id, format: :html) : api_shortlist_index_path(format: :html),
@@ -27,11 +27,11 @@
         </div>
       </div>
       <p class="profile-summary">
-        <%= @school.name %> is a <%= @school.entity_type.to_s.humanize.downcase.presence || "school" %> school<%= " in #{@profile.city_state}" if @profile.city_state.present? %><%= ", part of #{@profile.district}" if @profile.district.present? %>.
+        <%= @school.name %> is a <%= @school.entity_type.present? ? "#{@school.entity_type.humanize.downcase} school" : "school" %><%= " in #{@profile.city_state}" if @profile.city_state.present? %><%= ", part of #{@profile.district}" if @profile.district.present? %>.
         <%= "It offers a Gifted & Talented program." if @profile.source["gifted_talented"] == true %>
       </p>
       <ul class="profile-facts" aria-label="School facts">
-        <li><%= @school.entity_type.to_s.titleize.presence || "School type unavailable" %> school</li>
+        <li><%= @school.entity_type.present? ? "#{@school.entity_type.titleize} school" : "School type unavailable" %></li>
         <li>Grades <%= @school.grades.presence || "not provided" %></li>
         <% if @profile.enrollment %><li><%= number_with_delimiter(@profile.enrollment) %> students</li><% end %>
         <li class="profile-demo-label">Demo school data</li>
@@ -43,17 +43,17 @@
           </span>
           <div><strong><%= @profile.rating_label %></strong><span>GreatSchools Rating</span></div>
         </div>
-        <%= link_to "#reviews", class: "profile-review-summary" do %>
+        <%= link_to "#reviews", class: "profile-review-summary", data: { turbo: false } do %>
           <span><span aria-hidden="true" class="profile-stars" style="--review-percent: <%= ((@school.avg_review_rating || 0) / 5.0 * 100).round %>%">★★★★★</span> <strong><%= @school.avg_review_rating || "—" %></strong></span>
           <span><%= @school.review_count ? pluralize(@school.review_count, "review") : "Reviews" %></span>
         <% end %>
       </div>
     </div>
   </div>
-    <nav class="profile-section-nav" aria-label="Section navigation">
+    <nav class="profile-section-nav" aria-label="Section navigation" data-turbo="false">
       <div class="profile-shell">
         <% { "overview" => "Overview", "from-school" => "About the school", "enrollment" => "Enrollment",
-             "academics" => "Academics", "school-culture" => "School culture", "courses-activities" => "Courses & activities",
+             "academics" => "Academics", "student-support" => "Student support", "school-culture" => "School culture", "courses-activities" => "Courses & activities",
              "reviews" => "Reviews", "neighborhood" => "Neighborhood" }.each do |anchor, label| %>
           <%= link_to label, "##{anchor}", data: { school_profile_target: "navLink", action: "school-profile#select" } %>
         <% end %>
@@ -73,7 +73,7 @@
                 <strong><%= @profile.rating_label %></strong>
               </div>
               <% @profile.rating_factors.each do |field, value| %>
-                <%= link_to "#academics", class: "profile-rating-factor" do %>
+                <%= link_to "#academics", class: "profile-rating-factor", data: { turbo: false } do %>
                   <span class="profile-rating-badge profile-rating-small"><%= value %><small>/10</small></span>
                   <span><%= SchoolProfile::RATING_FIELDS.fetch(field) %></span>
                   <small><%= @profile.rating_label(value) %></small>
@@ -82,6 +82,7 @@
               <details class="profile-disclosure">
                 <summary>Where this data comes from</summary>
                 <p>Ratings and school information come from the synthetic GreatSchools demo dataset.</p>
+                <p>State grades, state rankings, and rating weights are not included in this dataset.</p>
                 <% if @profile.updated_on %><p>Dataset updated <%= @profile.updated_on.strftime("%B %-d, %Y") %>.</p><% end %>
               </details>
             </div>
@@ -124,8 +125,18 @@
                 <div><dt>Phone</dt><dd><% if @profile.phone %><%= link_to @profile.phone, "tel:#{@profile.phone.gsub(/[^0-9+]/, '')}" %><% else %>Not provided<% end %></dd></div>
                 <% if @profile.leader_email.present? %><div><dt>School leader email</dt><dd><%= mail_to @profile.leader_email %></dd></div><% end %>
                 <div><dt>Website</dt><dd><% if @profile.website %><%= link_to URI.parse(@profile.website).host, @profile.website, target: "_blank", rel: "noopener" %><% else %>Not provided<% end %></dd></div>
-                <% @profile.school_info.each do |label, value| %><div><dt><%= label %></dt><dd><%= value %></dd></div><% end %>
+                <% @profile.school_info.slice("School type", "District", "School leader").each do |label, value| %><div><dt><%= label %></dt><dd><%= value %></dd></div><% end %>
               </dl>
+              <% more_info = @profile.school_info.except("School type", "District", "School leader") %>
+              <% if more_info.any? || @profile.facebook_url %>
+                <details class="profile-disclosure">
+                  <summary>See all school info</summary>
+                  <dl class="profile-details">
+                    <% more_info.each do |label, value| %><div><dt><%= label %></dt><dd><%= value %></dd></div><% end %>
+                    <% if @profile.facebook_url %><div><dt>Facebook</dt><dd><%= link_to "School Facebook page ↗", @profile.facebook_url, target: "_blank", rel: "noopener" %></dd></div><% end %>
+                  </dl>
+                </details>
+              <% end %>
             </div>
             <div class="profile-card">
               <h3>In the school's words</h3>
@@ -140,12 +151,30 @@
 
         <section id="enrollment" class="profile-section" aria-labelledby="enrollment-heading">
           <h2 id="enrollment-heading" class="profile-section-heading">Enrollment</h2>
+          <div class="profile-two-columns">
           <div class="profile-card">
             <h3>Total students</h3>
             <p class="profile-metric"><%= @profile.enrollment ? number_with_delimiter(@profile.enrollment) : "Not provided" %></p>
             <div class="profile-metric-rule"></div>
             <h3>Student demographics</h3>
             <p class="profile-muted">Enrollment by race, ethnicity, gender, and family income is not provided in this dataset.</p>
+          </div>
+          <div class="profile-card">
+            <h3>Admissions</h3>
+            <dl class="profile-details">
+              <div><dt>Application deadline</dt><dd>
+                <% deadline = @profile.application_deadline_date %>
+                <% if deadline %>
+                  <time datetime="<%= deadline.iso8601 %>"><%= deadline.strftime("%B %-d, %Y") %></time>
+                  <% if deadline < Date.current %><p class="profile-muted">Past deadline; check with the school for current dates.</p><% end %>
+                <% else %><%= @profile.application_deadline.presence || "Not provided" %><% end %>
+              </dd></div>
+              <div><dt>Requirements</dt><dd><%= @profile.application_requirements.to_sentence.presence || "Not provided" %></dd></div>
+            </dl>
+            <% if @profile.admissions_url %>
+              <%= link_to "School admissions information ↗", @profile.admissions_url, target: "_blank", rel: "noopener", class: "profile-text-link" %>
+            <% else %><p class="profile-muted">An admissions website is not provided.</p><% end %>
+          </div>
           </div>
         </section>
 
@@ -156,11 +185,57 @@
               <div class="profile-card">
                 <h3><%= SchoolProfile::RATING_FIELDS.fetch(field) %></h3>
                 <div class="profile-rating-detail"><span class="profile-rating-badge"><%= value %><small>/10</small></span><strong><%= @profile.rating_label(value) %></strong></div>
-                <details class="profile-disclosure"><summary>About this rating</summary><p>This score is provided by the demo school dataset. Student group comparisons and state averages are not supplied.</p></details>
+                <details class="profile-disclosure"><summary>About this rating</summary><p>This score is provided by the demo school dataset. Subject proficiency percentages and state averages are not supplied.</p></details>
               </div>
             <% end %>
             <% if @profile.rating_factors.empty? %><div class="profile-card"><p class="profile-muted">Academic ratings are not provided for this school.</p></div><% end %>
           </div>
+          <% if @profile.student_group_ratings.any? %>
+            <div class="profile-card profile-detail-block">
+              <h3>Test score ratings by student group</h3>
+              <p class="profile-muted">These are ratings on a 10-point scale. They do not represent proficiency percentages or enrollment shares.</p>
+              <dl class="profile-details">
+                <% @profile.student_group_ratings.each do |label, rating| %><div><dt><%= label %></dt><dd><strong><%= rating %>/10</strong></dd></div><% end %>
+              </dl>
+            </div>
+          <% end %>
+          <% unless @profile.source["graduation_rate"].nil? %>
+            <div class="profile-card profile-detail-block">
+              <h3>Graduation rate</h3>
+              <p class="profile-metric"><%= number_with_precision(@profile.source["graduation_rate"], precision: 1, strip_insignificant_zeros: true) %>%</p>
+              <p class="profile-muted">Reported in the demo dataset.</p>
+            </div>
+          <% end %>
+          <% if Array(@profile.source["cambridge_international"]).any? %>
+            <div class="profile-card profile-detail-block">
+              <h3>Cambridge International</h3>
+              <p>Listed in the dataset for <%= Array(@profile.source["cambridge_international"]).to_sentence %>. Confirm current availability with the school.</p>
+            </div>
+          <% end %>
+          <details class="profile-disclosure">
+            <summary>Which academic details are available?</summary>
+            <p>Subject-level proficiency, state averages, advanced-course participation rates, and historical comparisons are not supplied in this demo feed.</p>
+          </details>
+        </section>
+
+        <section id="student-support" class="profile-section" aria-labelledby="support-heading">
+          <h2 id="support-heading" class="profile-section-heading">Student support</h2>
+          <% english_support = @profile.english_learning_support %>
+          <div class="profile-card profile-support-intro">
+            <h3>Support for students learning English</h3>
+            <% if english_support.present? %>
+              <p><%= english_support["qualifies"] == true ? "English learning support is highlighted in this school's demo record." : "The demo record includes an English learning support indicator." %></p>
+              <dl class="profile-details">
+                <% if english_support["tier"].present? %><div><dt>Support indicator</dt><dd><%= english_support["tier"].humanize %></dd></div><% end %>
+                <% if english_support["confidence"].present? %><div><dt>Data confidence</dt><dd><%= english_support["confidence"].humanize %></dd></div><% end %>
+              </dl>
+            <% else %><p class="profile-muted">English learning support information is not provided.</p><% end %>
+          </div>
+          <%= render "program_groups", groups: @profile.support_programs %>
+          <details class="profile-disclosure">
+            <summary>About student support information</summary>
+            <p>These offerings come from the school record in the synthetic dataset. Individual eligibility, IEP and 504 services, staffing, and current availability need confirmation with the school.</p>
+          </details>
         </section>
 
         <section id="school-culture" class="profile-section" aria-labelledby="culture-heading">
@@ -177,26 +252,19 @@
               <h3>Teachers & staff</h3>
               <p class="profile-metric"><%= @profile.source["student_teacher_ratio"] || "Not provided" %></p>
               <p class="profile-muted">Students per teacher</p>
+              <p class="profile-muted">This is a staffing ratio; it does not describe the number of students in an individual class.</p>
               <% if @profile.source.dig("class_size", "tier").present? %><p class="profile-trend">Class sizes · <%= @profile.source.dig("class_size", "tier").humanize %></p><% end %>
             </div>
+          </div>
+          <div class="profile-card profile-detail-block">
+            <h3>Discipline & staff details</h3>
+            <p class="profile-muted">Suspension rates, teacher certification, counselor ratios, and year-by-year attendance are not supplied in this dataset.</p>
           </div>
         </section>
 
         <section id="courses-activities" class="profile-section" aria-labelledby="courses-heading">
           <h2 id="courses-heading" class="profile-section-heading">Courses & activities</h2>
-          <div class="profile-two-columns">
-            <% @profile.programs.each do |label, entries| %>
-              <div class="profile-card">
-                <h3><%= label %></h3>
-                <% if entries.any? %>
-                  <p class="profile-muted"><%= pluralize(entries.size, label == "Academic clubs" ? "club" : "program") %></p>
-                  <ul class="profile-programs"><% entries.each do |entry| %><li><%= entry %></li><% end %></ul>
-                <% else %>
-                  <p class="profile-muted">No published <%= label.downcase %> information.</p>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
+          <%= render "program_groups", groups: @profile.programs %>
         </section>
 
         <section id="reviews" class="profile-section" aria-labelledby="reviews-heading">
@@ -205,6 +273,19 @@
             <p class="profile-metric"><%= @school.avg_review_rating || "—" %><small> out of 5</small></p>
             <p><%= @school.review_count ? pluralize(@school.review_count, "review") : "Review count not provided" %></p>
           </div>
+          <% if @profile.review_topics.any? %>
+            <details class="profile-card profile-detail-block profile-review-topics">
+              <summary>Review topics & sentiment</summary>
+              <p class="profile-muted">Counts describe topic mentions in the demo reviews. One review can mention several topics; these are not individual star ratings.</p>
+              <div class="profile-table-scroll">
+                <table class="profile-topic-table">
+                  <caption class="sr-only">Review topic sentiment counts</caption>
+                  <thead><tr><th scope="col">Topic</th><th scope="col">Positive</th><th scope="col">Neutral</th><th scope="col">Negative</th></tr></thead>
+                  <tbody><% @profile.review_topics.each do |topic, counts| %><tr><th scope="row"><%= topic %></th><td><%= counts["positive"].to_i %></td><td><%= counts["neutral"].to_i %></td><td><%= counts["negative"].to_i %></td></tr><% end %></tbody>
+                </table>
+              </div>
+            </details>
+          <% end %>
           <% if @profile.reviews.any? %>
             <p class="profile-muted profile-review-count"><%= pluralize(@profile.reviews.size, "review") %> available in the demo dataset</p>
             <% @profile.reviews.each do |review| %>
@@ -261,7 +342,7 @@
           <h3>School information</h3>
           <p class="profile-muted">This profile uses synthetic demo data.</p>
           <% if @profile.updated_on %><p class="profile-muted">Dataset updated <%= @profile.updated_on.strftime("%B %-d, %Y") %>.</p><% end %>
-          <a href="#evidence" class="profile-text-link">See your matching evidence</a>
+          <a href="#evidence" class="profile-text-link" data-turbo="false">See your matching evidence</a>
         </div>
       </aside>
     </div>

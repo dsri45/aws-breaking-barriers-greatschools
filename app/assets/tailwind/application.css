@@ -229,7 +229,7 @@
   min-width: 0;
 }
 .profile-section {
-  scroll-margin-top: 100px;
+  scroll-margin-top: 140px;
   margin-bottom: 42px;
 }
 .profile-section-heading {
@@ -343,12 +343,25 @@
 }
 .profile-evidence {
   margin-top: 12px;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 140px;
 }
 .profile-muted {
   color: #6b7066;
   font-size: 14px;
 }
+.profile-detail-block { margin-top: 12px; }
+.profile-support-intro { margin-bottom: 12px; }
+.profile-review-topics > summary {
+  cursor: pointer;
+  color: #1c465a;
+  font-weight: 700;
+}
+.profile-review-topics > p { margin-top: 12px; }
+.profile-table-scroll { overflow-x: auto; }
+.profile-topic-table { width: 100%; margin-top: 14px; border-collapse: collapse; font-size: 13px; }
+.profile-topic-table th, .profile-topic-table td { padding: 10px 8px; border-bottom: 1px solid #e4e5de; text-align: left; }
+.profile-topic-table td { text-align: center; }
+.profile-topic-table thead { color: #6b7066; }
 .profile-school-words {
   margin-top: 12px;
   line-height: 1.7;
@@ -511,10 +524,10 @@
     top: 112px;
   }
   .profile-section {
-    scroll-margin-top: 150px;
+    scroll-margin-top: 180px;
   }
   .profile-evidence {
-    scroll-margin-top: 150px;
+    scroll-margin-top: 180px;
   }
 }
 
