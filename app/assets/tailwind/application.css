@@ -20,3 +20,934 @@
   --color-highlight: #DDEFE3;
   --color-heart: #D64545;
 }
+
+.school-profile {
+  color: #20221f;
+  background: #fff;
+  font-size: 15px;
+  line-height: 1.55;
+}
+.school-profile a {
+  color: #1c465a;
+}
+.school-profile a:hover {
+  text-decoration: underline;
+}
+.profile-shell {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 64px;
+}
+.profile-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #fff;
+}
+.profile-header-row {
+  display: flex;
+  align-items: center;
+  min-height: 74px;
+  gap: 28px;
+}
+.profile-logo {
+  display: flex;
+  flex-direction: column;
+  color: #535b5f !important;
+  font-weight: 800;
+  line-height: .85;
+  flex-shrink: 0;
+  font-size: 30px;
+  letter-spacing: -1.5px;
+}
+.profile-logo small {
+  margin-top: 2px;
+  color: #4e9dc4;
+  letter-spacing: -.3px;
+  font-size: 13px;
+}
+.profile-logo-accent {
+  color: #4e9dc4;
+}
+.profile-search {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 520px;
+  padding: 10px 14px 10px 24px;
+  border: 1px solid #dedfdc;
+  border-radius: 8px;
+  box-shadow: 0 1px 8px #0002;
+}
+.profile-search input {
+  min-width: 0;
+  flex: 1;
+  background: transparent;
+  outline-offset: 3px;
+}
+.profile-search button {
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  background: #1c465a;
+  color: white;
+  font-size: 23px;
+  line-height: 1;
+  cursor: pointer;
+}
+.profile-header-links {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  font-weight: 600;
+}
+.profile-header-links a {
+  color: #20221f;
+}
+.profile-intro {
+  background: #fff;
+}
+.profile-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding-block: 12px;
+  font-size: 14px;
+}
+.profile-breadcrumbs a {
+  color: inherit;
+}
+.profile-title-row {
+  max-width: 758px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.profile-title-row h1 {
+  max-width: 440px;
+  font-size: 30px;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -.7px;
+}
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 8px;
+  flex-shrink: 0;
+}
+.school-profile .profile-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-width: 100px;
+  padding: 6px 20px;
+  border: 1px solid #9a9b95;
+  border-radius: 100px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #20221f;
+  background: #fff;
+}
+.school-profile .profile-button-primary {
+  color: #fff;
+  background: #1c465a;
+  border-color: #1c465a;
+}
+.profile-summary {
+  max-width: 758px;
+  margin-block: 18px 14px;
+}
+.profile-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+}
+.profile-facts li {
+  padding: 2px 8px;
+  background: #f5f5f2;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.profile-facts .profile-demo-label {
+  color: #65706c;
+}
+.profile-rating-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  margin-top: 20px;
+  padding-bottom: 12px;
+}
+.profile-rating-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  border-right: 1px solid #dddeda;
+  padding-right: 20px;
+}
+.profile-rating-label > div {
+  display: flex;
+  flex-direction: column;
+}
+.profile-rating-label > div > span {
+  color: #6b6d66;
+  font-size: 13px;
+}
+.profile-rating-badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #549fbe;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 700;
+}
+.profile-rating-badge small {
+  align-self: center;
+  margin-top: 9px;
+  font-size: 12px;
+}
+.profile-rating-small {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+}
+.profile-rating-small small {
+  font-size: 10px;
+  margin-top: 5px;
+}
+.profile-rating-label .profile-rating-badge {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+}
+.profile-rating-label .profile-rating-badge small {
+  font-size: 10px;
+  margin-top: 5px;
+}
+.profile-rating-badge.is-unrated {
+  background: #838e92;
+}
+.profile-review-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+}
+.profile-review-summary strong {
+  color: #20221f;
+  margin-left: 12px;
+}
+.profile-stars {
+  background: linear-gradient(to right, #e6b24e var(--review-percent), #d9dcd4 var(--review-percent));
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 2px;
+}
+.profile-section-nav {
+  position: sticky;
+  top: 74px;
+  z-index: 20;
+  background: #fff;
+  border-bottom: 1px solid #d8d9d3;
+}
+.profile-section-nav .profile-shell {
+  display: flex;
+  white-space: nowrap;
+  overflow-x: auto;
+  gap: 0;
+}
+.profile-section-nav a {
+  padding: 14px 12px 12px;
+  color: #20221f;
+  font-size: 14px;
+  border-bottom: 2px solid transparent;
+}
+.profile-section-nav a[aria-current="location"] {
+  border-color: #1c465a;
+  color: #1c465a;
+}
+.profile-section-nav a:hover, .profile-section-nav a:focus {
+  border-color: #1c465a;
+  text-decoration: none;
+}
+.profile-content {
+  background: #ecece6;
+  padding-block: 30px 56px;
+}
+.profile-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 758px) minmax(230px, 1fr);
+  gap: 32px;
+}
+.profile-main {
+  min-width: 0;
+}
+.profile-section {
+  scroll-margin-top: 100px;
+  margin-bottom: 42px;
+}
+.profile-section-heading {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 8px 0 24px;
+  color: #141512;
+}
+.profile-section-heading::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid #d9dad4;
+}
+.profile-card {
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #d9dbd4;
+  border-radius: 15px;
+  box-shadow: 0 1px 3px #0000000d;
+}
+.profile-card h3 {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 16px;
+  color: #161813;
+}
+.profile-overview-grid, .profile-two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.profile-card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.profile-rating-card {
+  border-left: 3px solid #549fbe;
+}
+.profile-rating-detail {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-block: 24px;
+}
+.profile-rating-factor {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-block: 16px;
+  border-bottom: 1px solid #dedfd9;
+}
+.profile-rating-factor > span:nth-child(2) {
+  flex: 1;
+}
+.profile-rating-factor > small {
+  max-width: 82px;
+  color: #676d62;
+  text-align: right;
+  font-size: 13px;
+}
+.profile-disclosure {
+  border-top: 1px solid #e4e5de;
+  margin-top: 18px;
+  padding-top: 12px;
+  font-size: 13px;
+}
+.profile-disclosure summary {
+  cursor: pointer;
+  color: #1c465a;
+  font-weight: 600;
+}
+.profile-disclosure p {
+  margin-top: 10px;
+  line-height: 1.65;
+}
+.profile-details > div {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) 1.5fr;
+  gap: 14px;
+  padding-block: 10px;
+  border-bottom: 1px solid #eceee7;
+  font-size: 14px;
+}
+.profile-details > div:last-child {
+  border-bottom: 0;
+}
+.profile-details dt {
+  color: #6b7066;
+}
+.profile-details dd {
+  overflow-wrap: anywhere;
+}
+.profile-highlights {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  font-weight: 600;
+}
+.profile-highlights li {
+  display: flex;
+  gap: 12px;
+}
+.profile-highlights span {
+  color: #47796b;
+}
+.profile-evidence {
+  margin-top: 12px;
+  scroll-margin-top: 100px;
+}
+.profile-muted {
+  color: #6b7066;
+  font-size: 14px;
+}
+.profile-school-words {
+  margin-top: 12px;
+  line-height: 1.7;
+}
+.profile-metric {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-block: 8px;
+}
+.profile-metric small {
+  font-size: 15px;
+  font-weight: 400;
+}
+.profile-metric-rule {
+  border-bottom: 1px solid #e4e5de;
+  margin-block: 24px;
+}
+.profile-trend {
+  font-size: 14px;
+  margin-top: 18px;
+}
+.profile-programs {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+}
+.profile-programs li {
+  background: #f4f5f0;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+.profile-review-overview {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.profile-review-count {
+  margin-block: 18px 12px;
+}
+.profile-review {
+  margin-bottom: 12px;
+}
+.profile-review-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+.profile-review-meta time {
+  color: #6b7066;
+}
+.profile-review > p {
+  line-height: 1.75;
+}
+.profile-location-map {
+  height: 300px;
+  margin-block: 20px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.profile-location-map > section {
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+}
+.school-profile .profile-text-link {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 16px;
+}
+.profile-more-schools {
+  margin-top: 12px;
+}
+.profile-nearby-school {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-block: 16px;
+  border-bottom: 1px solid #e4e5de;
+}
+.profile-nearby-school:last-child {
+  border-bottom: 0;
+}
+.profile-nearby-school a {
+  font-weight: 600;
+}
+.profile-sidebar {
+  padding-top: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+}
+.profile-sidebar .profile-card {
+  box-shadow: none;
+  background: #f8f8f5;
+}
+.profile-sidebar p {
+  font-size: 14px;
+}
+.profile-footer {
+  background: #fff;
+  padding-block: 28px;
+  border-top: 1px solid #d9dbd4;
+  font-size: 14px;
+}
+@media (max-width: 1100px) {
+  .profile-shell {
+    padding-inline: 32px;
+  }
+  .profile-header-links {
+    gap: 14px;
+    font-size: 13px;
+  }
+  .profile-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .profile-sidebar {
+    display: none;
+  }
+  .profile-title-row, .profile-summary {
+    max-width: 100%;
+  }
+}
+@media (max-width: 640px) {
+  .profile-shell {
+    padding-inline: 20px;
+  }
+  .profile-header-row {
+    min-height: 64px;
+    gap: 18px;
+    flex-wrap: wrap;
+    padding-block: 14px;
+  }
+  .profile-search {
+    padding: 6px 8px 6px 12px;
+  }
+  .profile-header-links {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .profile-logo {
+    font-size: 26px;
+  }
+  .profile-logo small {
+    font-size: 11px;
+  }
+  .profile-title-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .profile-title-row h1 {
+    font-size: 28px;
+  }
+  .profile-actions {
+    padding-top: 0;
+  }
+  .profile-summary {
+    margin-top: 14px;
+  }
+  .profile-breadcrumbs {
+    font-size: 12px;
+  }
+  .profile-overview-grid, .profile-two-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .profile-section-heading {
+    font-size: 30px;
+  }
+  .profile-content {
+    padding-top: 20px;
+  }
+  .profile-card {
+    padding: 18px;
+  }
+  .profile-section-nav {
+    top: 112px;
+  }
+  .profile-section {
+    scroll-margin-top: 150px;
+  }
+  .profile-evidence {
+    scroll-margin-top: 150px;
+  }
+}
+
+.guided-search-page {
+  --color-ink: #20221f;
+  --color-ink-2: #474c43;
+  --color-muted: #6b7066;
+  --color-line: #d9dbd4;
+  --color-line-2: #cbd0c4;
+  --color-ground: #ecece6;
+  --color-navy: #1c465a;
+  --color-blue: #1c465a;
+  --color-blue-soft: #eaf1ee;
+  --color-pin: #549fbe;
+  --color-highlight: #edf3dd;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-ink);
+  background: var(--color-ground);
+}
+.guided-search-page :is(button, input[type="submit"], select) {
+  cursor: pointer;
+}
+.guided-search-page :disabled {
+  cursor: default;
+}
+.guided-search-page :is(button, a, input, select):focus-visible {
+  outline: 2px solid #549fbe;
+  outline-offset: 3px;
+}
+.search-header {
+  border-bottom: 1px solid var(--color-line);
+}
+.search-header-row {
+  padding-inline: 28px;
+  min-height: 80px;
+}
+.search-header-form {
+  max-width: 620px;
+}
+.search-header-form button {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+.search-my-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.search-priorities {
+  padding: 16px 28px;
+  gap: 10px;
+}
+.search-priorities-label {
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.search-priority {
+  border-color: #cbd0c4;
+  min-height: 36px;
+  font-size: 13px;
+}
+.search-priority[aria-pressed="true"],
+.search-priority[title="Search all grade levels"] {
+  background: #edf3e9;
+  border-color: #9db4a7;
+}
+.search-priority-importance {
+  background: #f0f1eb;
+  color: #5e665a;
+  border-radius: 4px;
+  padding-block: 1px;
+}
+.search-priority[aria-pressed="true"] .search-priority-importance {
+  color: #1c465a;
+  background: #dce7dc;
+}
+.search-priorities select {
+  border-color: var(--color-line-2);
+  border-radius: 6px;
+}
+.search-chat-header {
+  padding-block: 20px;
+}
+.search-section-title {
+  color: #141512;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.5px;
+}
+.search-chat-header .search-section-title {
+  font-size: 24px;
+  letter-spacing: -.3px;
+}
+.search-grade-label {
+  color: #5e665a;
+  border: 0;
+  background: #f4f5ef;
+  font-size: 12px;
+}
+.search-chat #messages {
+  padding: 24px 20px;
+  gap: 20px;
+}
+.search-chat-message {
+  background: #f0f1eb;
+  border: 1px solid #e4e6dc;
+  border-radius: 15px 15px 4px 15px;
+  color: #363d32;
+  font-size: 14px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.search-chat-reply {
+  font-size: 14px;
+  line-height: 1.75;
+}
+.search-chat-status {
+  background: #f7f8f3;
+  border: 1px solid #e4e6dc;
+  border-radius: 12px;
+  line-height: 1.6;
+}
+.search-chat #messages > .rounded-xl {
+  border-color: #c5d5c9;
+  background: #f5f8f1;
+  border-radius: 15px;
+}
+.search-chat-composer {
+  padding: 16px;
+}
+.search-chat-form {
+  background: #fff;
+  border: 1px solid #b2c3bd;
+  box-shadow: 0 1px 5px #0000000d;
+}
+.search-chat-form button {
+  font-size: 13px;
+  padding-inline: 16px;
+}
+.search-pane-separator {
+  position: relative;
+  background: #f4f5ef;
+}
+.search-pane-separator::after {
+  content: "";
+  position: absolute;
+  top: 45%;
+  left: 2px;
+  width: 2px;
+  height: 28px;
+  border-radius: 2px;
+  background: #b7bfb1;
+}
+.search-pane-separator:hover,
+.search-pane-separator:focus-visible {
+  background: #e1e9df;
+}
+.search-results-header {
+  padding: 24px 24px 18px;
+  gap: 12px;
+}
+.search-results-header > h2 {
+  width: 100%;
+}
+.search-results-actions {
+  width: 100%;
+  gap: 10px;
+}
+.search-results-actions input[type="submit"],
+.search-results-actions button {
+  padding-inline: 16px;
+  border-color: #b6beb0;
+  border-radius: 100px;
+  font-size: 12px;
+  color: #35422f;
+  background: #f8f9f4;
+}
+.search-results-actions p {
+  flex: 1;
+  font-size: 11px;
+}
+.search-results-list {
+  padding-inline: 24px;
+  gap: 16px;
+}
+.search-school-card {
+  position: relative;
+  padding: 20px;
+  gap: 16px;
+  border-radius: 15px;
+  box-shadow: 0 1px 3px #0000000d;
+}
+.search-school-card-selected {
+  border-left: 3px solid #549fbe;
+  padding-left: 18px;
+}
+.search-school-illustration {
+  width: 112px;
+  height: 112px;
+  background: #e5ece7;
+}
+.search-school-illustration > svg {
+  width: 100%;
+  height: 100%;
+  opacity: .9;
+}
+.search-school-illustration > span {
+  padding: 1px 4px;
+  font-size: 9px;
+  color: #697360;
+}
+.search-school-illustration button {
+  border: 1px solid #e2e5da;
+  width: 30px;
+  height: 30px;
+}
+.search-school-name {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -.3px;
+}
+.search-school-name a {
+  color: #20221f;
+}
+.search-school-name a:hover {
+  color: #1c465a;
+  text-decoration: underline;
+}
+.search-school-content {
+  gap: 10px;
+}
+.search-school-reviews {
+  font-size: 12px;
+  color: #626b59;
+}
+.search-school-rating {
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
+}
+.search-school-rating small {
+  font-size: 10px;
+  margin-top: 7px;
+}
+.search-school-evidence {
+  padding-block: 6px;
+  gap: 10px;
+}
+.search-school-actions {
+  border-top: 1px solid #e5e7dd;
+  padding-top: 14px;
+  gap: 10px 16px;
+  font-size: 12px;
+}
+.search-school-actions a:hover {
+  text-decoration: underline;
+}
+.search-feedback {
+  font-size: 13px;
+  padding-block: 12px;
+}
+.search-feedback button {
+  padding-inline: 16px;
+  border-color: #c2cbbb;
+}
+.guided-search-page .search-map-pane {
+  background: #e8ece5;
+}
+.guided-search-page .search-map-message {
+  background: #fffffff5;
+  border: 1px solid #d9dbd4;
+  border-radius: 15px;
+  padding: 18px;
+  box-shadow: 0 1px 3px #0000000d;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.guided-search-page .search-map-message li {
+  margin-top: 12px;
+}
+@media (max-width: 1023px) {
+  .search-header-row {
+    flex-wrap: wrap;
+    padding-block: 16px;
+    gap: 16px;
+  }
+  .search-header-form {
+    max-width: none;
+  }
+  .search-header-row .profile-header-links {
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+    font-size: 13px;
+  }
+}
+@media (max-width: 640px) {
+  .search-header-row {
+    padding-inline: 20px;
+  }
+  .search-priorities {
+    padding: 16px 20px;
+    gap: 8px;
+  }
+  .search-priorities-label {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+  .search-priorities form {
+    max-width: 100%;
+  }
+  .search-priorities select {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .search-results-header {
+    padding: 24px 20px 16px;
+  }
+  .search-section-title {
+    font-size: 28px;
+  }
+  .search-results-list {
+    padding-inline: 16px;
+  }
+  .search-school-card {
+    padding: 18px;
+  }
+  .search-school-card-selected {
+    padding-left: 16px;
+  }
+  .search-school-illustration {
+    width: 96px;
+    height: 96px;
+  }
+  .search-school-content {
+    min-width: 100%;
+  }
+}

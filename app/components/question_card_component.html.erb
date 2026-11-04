@@ -3,7 +3,7 @@
   <% if @hint %><p class="mb-3 text-[13px] text-muted"><%= @hint %></p><% end %>
   <div class="flex flex-wrap gap-2">
     <% @options.each do |option| %>
-      <button type="button" class="<%= option_classes(option) %>" aria-pressed="<%= option == @selected %>"><%= option %></button>
+      <span class="<%= option_classes(option) %>"><%= option %><%= " ✓" if option == @selected %></span>
     <% end %>
   </div>
 </div>

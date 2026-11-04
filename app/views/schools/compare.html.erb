@@ -1,0 +1,41 @@
+<% content_for :title, "Compare schools" %>
+<main class="mx-auto max-w-6xl px-6 py-8">
+  <%= link_to "← Back to schools", @back_path, class: "font-semibold text-blue" %>
+  <h1 class="my-4 text-3xl font-bold text-navy">Compare schools</h1>
+  <div class="overflow-x-auto rounded-2xl border border-line bg-white">
+    <table class="w-full border-collapse text-left text-sm">
+      <thead class="bg-blue-soft">
+        <tr>
+          <th scope="col" class="p-4">School details</th>
+          <% @schools.each do |school| %>
+            <th scope="col" class="min-w-40 p-4">
+              <%= link_to school.name, school_profile_path(school.school_id, view: params[:view]), class: "font-bold text-blue" %>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% {
+          "School type" => ->(school) { school.entity_type.to_s.titleize.presence || "No data" },
+          "Grades" => ->(school) { school.grades.presence || "No data" },
+          "School rating" => ->(school) { school.rated? ? "#{school.summary_rating}/10" : "No rating yet" },
+          "Community reviews" => ->(school) { school_review_summary(school) }
+        }.each do |label, value| %>
+          <tr class="border-t border-line">
+            <th scope="row" class="p-4"><%= label %></th>
+            <% @schools.each do |school| %><td class="p-4"><%= value.call(school) %></td><% end %>
+          </tr>
+        <% end %>
+        <% @schools.flat_map(&:criteria).uniq(&:key).each do |priority| %>
+          <tr class="border-t border-line">
+            <th scope="row" class="p-4"><%= priority.label %></th>
+            <% @schools.each do |school| %>
+              <% evidence = school.criteria.find { |item| item.key == priority.key } %>
+              <td class="p-4"><%= evidence ? "#{evidence.status.humanize} · #{evidence.evidence}" : "No data" %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</main>

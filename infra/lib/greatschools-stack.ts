@@ -19,6 +19,7 @@ import { join, resolve } from "node:path";
 
 const modelId = "amazon.nova-pro-v1:0";
 const secretParameter = "/greatschools/guided-search/secret-key-base";
+const googleMapsKeyParameter = "/greatschools/guided-search/google-maps-api-key";
 const domainName = "greatschools-guided";
 
 export class GreatSchoolsStack extends Stack {
@@ -35,8 +36,8 @@ export class GreatSchoolsStack extends Stack {
       description: "IPv4 CIDRs for the demo audience, such as each viewer's public IPv4 followed by /32",
       allowedPattern: "([0-9]{1,3}\\.){3}[0-9]{1,3}/([1-9]|[12][0-9]|3[0-2])",
     });
-    const agentClass = adapterContext(this, "agentClass", "GuidedSearch::DemoAgent");
-    const retrieverClass = adapterContext(this, "retrieverClass", "GuidedSearch::DemoSearch");
+    const agentClass = adapterContext(this, "agentClass", "GuidedSearch::BedrockAgent");
+    const retrieverClass = adapterContext(this, "retrieverClass", "GuidedSearch::OpenSearchRetriever");
 
     const vpc = new ec2.Vpc(this, "Vpc", {
       // In us-east-1 CloudFront VPC origins are unavailable in use1-az3.
@@ -65,7 +66,8 @@ export class GreatSchoolsStack extends Stack {
     }));
     role.addToPolicy(new iam.PolicyStatement({
       actions: ["ssm:GetParameter"],
-      resources: [this.formatArn({ service: "ssm", resource: "parameter", resourceName: secretParameter.slice(1) })],
+      resources: [secretParameter, googleMapsKeyParameter].map(name =>
+        this.formatArn({ service: "ssm", resource: "parameter", resourceName: name.slice(1) })),
     }));
     role.addToPolicy(new iam.PolicyStatement({
       actions: ["bedrock:InvokeModel"],
@@ -164,6 +166,7 @@ AWS_DEFAULT_REGION='${this.region}'
 DB_HOST='${database.dbInstanceEndpointAddress}'
 DB_SECRET_ID='${database.secret!.secretArn}'
 SECRET_KEY_BASE_PARAMETER='${secretParameter}'
+GOOGLE_MAPS_KEY_PARAMETER='${googleMapsKeyParameter}'
 OPENSEARCH_URL='https://${domain.domainEndpoint}'
 BEDROCK_MODEL_ID='${modelId}'
 SYNTHETIC_DATA_BUCKET='${dataBucket.bucketName}'

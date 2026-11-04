@@ -15,7 +15,11 @@ unset db_secret
 export DB_USERNAME DB_PASSWORD SECRET_KEY_BASE
 
 if [[ "${1:-}" == "serve" ]]; then
-  bin/rails db:migrate
+  GOOGLE_MAPS_API_KEY=$(aws ssm get-parameter --name "$GOOGLE_MAPS_KEY_PARAMETER" \
+    --with-decryption --query Parameter.Value --output text) ||
+    echo "Google Maps key unavailable. Using the preview map." >&2
+  export GOOGLE_MAPS_API_KEY
+  ruby3.4 bin/rails db:migrate
   exec ruby3.4-bundle exec puma -C config/puma.rb
 fi
 exec "$@"

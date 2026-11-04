@@ -1,6 +1,5 @@
 dnf install -y ruby3.4 ruby3.4-devel ruby3.4-rubygem-bundler gcc gcc-c++ make \
   openssl-devel libyaml-devel nginx unzip amazon-cloudwatch-agent jq
-alternatives --set ruby /usr/bin/ruby3.4
 
 cat > /etc/greatschools/cloudwatch.json <<JSON
 {
@@ -32,7 +31,7 @@ cd /opt/greatschools
 runuser -u greatschools -- env BUNDLE_PATH=/opt/greatschools/vendor/bundle BUNDLE_FROZEN=true \
   ruby3.4-bundle install --jobs 2 --retry 3
 runuser -u greatschools -- env BUNDLE_PATH=/opt/greatschools/vendor/bundle BUNDLE_FROZEN=true \
-  RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile
+  RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 ruby3.4 bin/rails assets:precompile
 
 install -m 0755 /etc/greatschools/with-config /usr/local/bin/greatschools-run
 install -m 0644 /etc/greatschools/greatschools.service /etc/systemd/system/greatschools.service

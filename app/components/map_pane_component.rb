@@ -1,6 +1,4 @@
-# Map placeholder: projects result coordinates into the pane and draws
-# GreatSchools-style rating pins. Swap the background for an Amazon Location
-# Service map (MapLibre GL JS) on day 2; the pin data stays the same.
+# Renders the Google map when configured and supplies the SVG preview otherwise.
 class MapPaneComponent < ViewComponent::Base
   WIDTH = 380
   HEIGHT = 720
@@ -12,7 +10,17 @@ class MapPaneComponent < ViewComponent::Base
     @pins = pins
   end
 
+  def google_maps_key = ENV["GOOGLE_MAPS_API_KEY"].presence
+
+  def google_maps_pins
+    @pins.map do |pin|
+      { lat: pin.lat, lng: pin.lon, name: pin.name, rating: pin.rating, kind: pin.kind }
+    end
+  end
+
   def points
+    return [] if @pins.empty?
+
     lats = @pins.map(&:lat)
     lons = @pins.map(&:lon)
     lat_span = [ lats.max - lats.min, 0.001 ].max

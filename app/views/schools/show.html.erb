@@ -1,0 +1,286 @@
+<% content_for :title, "#{@school.name} | GreatSchools" %>
+<div class="school-profile" data-controller="school-profile">
+  <header class="profile-header">
+    <div class="profile-shell profile-header-row">
+      <%= link_to root_path, class: "profile-logo", aria: { label: "GreatSchools home" } do %>
+        <span>Great<span class="profile-logo-accent">!</span></span><small>SCHOOLS.org</small>
+      <% end %>
+      <%= form_with url: api_search_path(format: :html), class: "profile-search", data: { turbo_frame: "_top" } do |form| %>
+        <%= form.label :message, "Search schools", class: "sr-only" %>
+        <%= form.text_field :message, placeholder: "Find a school for your family", required: true, maxlength: 2000 %>
+        <%= form.button "⌕", aria: { label: "Search" } %>
+      <% end %>
+      <nav aria-label="Main navigation" class="profile-header-links">
+        <%= link_to "Parenting", "https://www.greatschools.org/gk/" %>
+        <%= link_to "Schools by district", "https://www.greatschools.org/best-schools/" %>
+        <%= link_to "My list", root_path(view: "shortlist") %>
+      </nav>
+    </div>
+  </header>
+
+  <div class="profile-intro">
+    <div class="profile-shell">
+      <nav aria-label="Breadcrumbs" class="profile-breadcrumbs">
+        <%= link_to "Guided Search", @back_path %><span aria-hidden="true">›</span>
+        <% if @profile.city_state.present? %><span><%= @profile.city_state %></span><span aria-hidden="true">›</span><% end %>
+        <% if @profile.district.present? %><span><%= @profile.district %></span><span aria-hidden="true">›</span><% end %>
+        <span aria-current="page"><%= @school.name %></span>
+      </nav>
+
+      <div class="profile-title-row">
+        <h1><%= @school.name %></h1>
+        <div class="profile-actions">
+          <%= link_to "Reviews", "#reviews", class: "profile-button" %>
+          <% if @allow_saving %>
+            <% saved = @school.saved %>
+            <%= button_to saved ? api_shortlist_path(@school.school_id, format: :html) : api_shortlist_index_path(format: :html),
+                  method: saved ? :delete : :post,
+                  params: { school_id: @school.school_id, return_to_profile: "1", view: params[:view] }.compact,
+                  aria: { pressed: saved }, class: "profile-button profile-button-primary" do %>
+              <span aria-hidden="true"><%= saved ? "♥" : "♡" %></span> <%= saved ? "Saved" : "Save" %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+      <p class="profile-summary">
+        <%= @school.name %> is a <%= @school.entity_type.to_s.humanize.downcase.presence || "school" %> school<%= " in #{@profile.city_state}" if @profile.city_state.present? %><%= ", part of #{@profile.district}" if @profile.district.present? %>.
+        <%= "It offers a Gifted & Talented program." if @profile.source["gifted_talented"] == true %>
+      </p>
+      <ul class="profile-facts" aria-label="School facts">
+        <li><%= @school.entity_type.to_s.titleize.presence || "School type unavailable" %> school</li>
+        <li>Grades <%= @school.grades.presence || "not provided" %></li>
+        <% if @profile.enrollment %><li><%= number_with_delimiter(@profile.enrollment) %> students</li><% end %>
+        <li class="profile-demo-label">Demo school data</li>
+      </ul>
+      <div class="profile-rating-summary">
+        <div class="profile-rating-label">
+          <span class="profile-rating-badge <%= 'is-unrated' unless @school.rated? %>">
+            <%= @school.summary_rating || "—" %><small>/10</small>
+          </span>
+          <div><strong><%= @profile.rating_label %></strong><span>GreatSchools Rating</span></div>
+        </div>
+        <%= link_to "#reviews", class: "profile-review-summary" do %>
+          <span><span aria-hidden="true" class="profile-stars" style="--review-percent: <%= ((@school.avg_review_rating || 0) / 5.0 * 100).round %>%">★★★★★</span> <strong><%= @school.avg_review_rating || "—" %></strong></span>
+          <span><%= @school.review_count ? pluralize(@school.review_count, "review") : "Reviews" %></span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+    <nav class="profile-section-nav" aria-label="Section navigation">
+      <div class="profile-shell">
+        <% { "overview" => "Overview", "from-school" => "About the school", "enrollment" => "Enrollment",
+             "academics" => "Academics", "school-culture" => "School culture", "courses-activities" => "Courses & activities",
+             "reviews" => "Reviews", "neighborhood" => "Neighborhood" }.each do |anchor, label| %>
+          <%= link_to label, "##{anchor}", data: { school_profile_target: "navLink", action: "school-profile#select" } %>
+        <% end %>
+      </div>
+    </nav>
+
+  <div class="profile-content">
+    <div class="profile-shell profile-columns">
+      <main class="profile-main">
+        <section id="overview" class="profile-section" aria-labelledby="overview-heading">
+          <h2 id="overview-heading" class="profile-section-heading">Overview</h2>
+          <div class="profile-overview-grid">
+            <div class="profile-card profile-rating-card">
+              <h3>GreatSchools Rating</h3>
+              <div class="profile-rating-detail">
+                <span class="profile-rating-badge"><%= @school.summary_rating || "—" %><small>/10</small></span>
+                <strong><%= @profile.rating_label %></strong>
+              </div>
+              <% @profile.rating_factors.each do |field, value| %>
+                <%= link_to "#academics", class: "profile-rating-factor" do %>
+                  <span class="profile-rating-badge profile-rating-small"><%= value %><small>/10</small></span>
+                  <span><%= SchoolProfile::RATING_FIELDS.fetch(field) %></span>
+                  <small><%= @profile.rating_label(value) %></small>
+                <% end %>
+              <% end %>
+              <details class="profile-disclosure">
+                <summary>Where this data comes from</summary>
+                <p>Ratings and school information come from the synthetic GreatSchools demo dataset.</p>
+                <% if @profile.updated_on %><p>Dataset updated <%= @profile.updated_on.strftime("%B %-d, %Y") %>.</p><% end %>
+              </details>
+            </div>
+            <div class="profile-card-stack">
+              <div class="profile-card">
+                <h3>School at a glance</h3>
+                <dl class="profile-details">
+                  <div><dt>Students</dt><dd><%= @profile.enrollment ? number_with_delimiter(@profile.enrollment) : "Not provided" %></dd></div>
+                  <div><dt>Students per teacher</dt><dd><%= @profile.source["student_teacher_ratio"] || "Not provided" %></dd></div>
+                  <div><dt>Grades</dt><dd><%= @school.grades.presence || "Not provided" %></dd></div>
+                </dl>
+              </div>
+              <div class="profile-card">
+                <h3>Highlights</h3>
+                <% if @profile.highlights.any? %>
+                  <ul class="profile-highlights"><% @profile.highlights.each do |highlight| %><li><span aria-hidden="true">✓</span><%= highlight %></li><% end %></ul>
+                <% else %>
+                  <p class="profile-muted">No highlights provided.</p>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <div id="evidence" class="profile-card profile-evidence">
+            <h3>How this school matches your priorities</h3>
+            <% if @school.criteria.any? %>
+              <ul class="space-y-3"><% @school.criteria.each do |evidence| %><%= render CriterionRowComponent.new(evidence:) %><% end %></ul>
+            <% else %>
+              <p class="profile-muted">Search with your priorities to see matching evidence.</p>
+            <% end %>
+          </div>
+        </section>
+
+        <section id="from-school" class="profile-section" aria-labelledby="about-heading">
+          <h2 id="about-heading" class="profile-section-heading">About the school</h2>
+          <div class="profile-two-columns">
+            <div class="profile-card">
+              <h3>School info</h3>
+              <dl class="profile-details">
+                <div><dt>Address</dt><dd><%= @profile.address.presence || "Not provided" %></dd></div>
+                <div><dt>Phone</dt><dd><% if @profile.phone %><%= link_to @profile.phone, "tel:#{@profile.phone.gsub(/[^0-9+]/, '')}" %><% else %>Not provided<% end %></dd></div>
+                <% if @profile.leader_email.present? %><div><dt>School leader email</dt><dd><%= mail_to @profile.leader_email %></dd></div><% end %>
+                <div><dt>Website</dt><dd><% if @profile.website %><%= link_to URI.parse(@profile.website).host, @profile.website, target: "_blank", rel: "noopener" %><% else %>Not provided<% end %></dd></div>
+                <% @profile.school_info.each do |label, value| %><div><dt><%= label %></dt><dd><%= value %></dd></div><% end %>
+              </dl>
+            </div>
+            <div class="profile-card">
+              <h3>In the school's words</h3>
+              <% if @profile.description.any? %>
+                <% @profile.description.each do |paragraph| %><p class="profile-school-words"><%= paragraph %></p><% end %>
+              <% else %>
+                <p class="profile-muted">A school description has not been provided.</p>
+              <% end %>
+            </div>
+          </div>
+        </section>
+
+        <section id="enrollment" class="profile-section" aria-labelledby="enrollment-heading">
+          <h2 id="enrollment-heading" class="profile-section-heading">Enrollment</h2>
+          <div class="profile-card">
+            <h3>Total students</h3>
+            <p class="profile-metric"><%= @profile.enrollment ? number_with_delimiter(@profile.enrollment) : "Not provided" %></p>
+            <div class="profile-metric-rule"></div>
+            <h3>Student demographics</h3>
+            <p class="profile-muted">Enrollment by race, ethnicity, gender, and family income is not provided in this dataset.</p>
+          </div>
+        </section>
+
+        <section id="academics" class="profile-section" aria-labelledby="academics-heading">
+          <h2 id="academics-heading" class="profile-section-heading">Academics</h2>
+          <div class="profile-two-columns">
+            <% @profile.rating_factors.each do |field, value| %>
+              <div class="profile-card">
+                <h3><%= SchoolProfile::RATING_FIELDS.fetch(field) %></h3>
+                <div class="profile-rating-detail"><span class="profile-rating-badge"><%= value %><small>/10</small></span><strong><%= @profile.rating_label(value) %></strong></div>
+                <details class="profile-disclosure"><summary>About this rating</summary><p>This score is provided by the demo school dataset. Student group comparisons and state averages are not supplied.</p></details>
+              </div>
+            <% end %>
+            <% if @profile.rating_factors.empty? %><div class="profile-card"><p class="profile-muted">Academic ratings are not provided for this school.</p></div><% end %>
+          </div>
+        </section>
+
+        <section id="school-culture" class="profile-section" aria-labelledby="culture-heading">
+          <h2 id="culture-heading" class="profile-section-heading">School culture</h2>
+          <div class="profile-two-columns">
+            <div class="profile-card">
+              <h3>Regular attendance</h3>
+              <% attendance = @profile.source["attendance_rate"] %>
+              <p class="profile-metric"><%= attendance ? "#{number_with_precision(attendance, precision: 1, strip_insignificant_zeros: true)}%" : "Not provided" %></p>
+              <p class="profile-muted">Attendance rate reported in the demo dataset.</p>
+              <% if @profile.source.dig("high_attendance", "trend").present? %><p class="profile-trend">Trend · <%= @profile.source.dig("high_attendance", "trend").humanize %></p><% end %>
+            </div>
+            <div class="profile-card">
+              <h3>Teachers & staff</h3>
+              <p class="profile-metric"><%= @profile.source["student_teacher_ratio"] || "Not provided" %></p>
+              <p class="profile-muted">Students per teacher</p>
+              <% if @profile.source.dig("class_size", "tier").present? %><p class="profile-trend">Class sizes · <%= @profile.source.dig("class_size", "tier").humanize %></p><% end %>
+            </div>
+          </div>
+        </section>
+
+        <section id="courses-activities" class="profile-section" aria-labelledby="courses-heading">
+          <h2 id="courses-heading" class="profile-section-heading">Courses & activities</h2>
+          <div class="profile-two-columns">
+            <% @profile.programs.each do |label, entries| %>
+              <div class="profile-card">
+                <h3><%= label %></h3>
+                <% if entries.any? %>
+                  <p class="profile-muted"><%= pluralize(entries.size, label == "Academic clubs" ? "club" : "program") %></p>
+                  <ul class="profile-programs"><% entries.each do |entry| %><li><%= entry %></li><% end %></ul>
+                <% else %>
+                  <p class="profile-muted">No published <%= label.downcase %> information.</p>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </section>
+
+        <section id="reviews" class="profile-section" aria-labelledby="reviews-heading">
+          <h2 id="reviews-heading" class="profile-section-heading">Reviews</h2>
+          <div class="profile-card profile-review-overview">
+            <p class="profile-metric"><%= @school.avg_review_rating || "—" %><small> out of 5</small></p>
+            <p><%= @school.review_count ? pluralize(@school.review_count, "review") : "Review count not provided" %></p>
+          </div>
+          <% if @profile.reviews.any? %>
+            <p class="profile-muted profile-review-count"><%= pluralize(@profile.reviews.size, "review") %> available in the demo dataset</p>
+            <% @profile.reviews.each do |review| %>
+              <article class="profile-card profile-review">
+                <div class="profile-review-meta">
+                  <strong>Community review</strong>
+                  <% date = Date.iso8601(review["created_date"].to_s) rescue nil %>
+                  <% if date %><time datetime="<%= date.iso8601 %>"><%= date.strftime("%b %Y") %></time><% end %>
+                </div>
+                <% if review["text"].to_s.length > 350 %>
+                  <p><%= truncate(review["text"], length: 300, separator: " ") %></p>
+                  <details class="profile-disclosure"><summary>Show full review</summary><p><%= review["text"] %></p></details>
+                <% else %><p><%= review["text"] %></p><% end %>
+              </article>
+            <% end %>
+          <% else %>
+            <div class="profile-card"><p class="profile-muted">Review text has not been provided for this school.</p></div>
+          <% end %>
+        </section>
+
+        <section id="neighborhood" class="profile-section" aria-labelledby="neighborhood-heading">
+          <h2 id="neighborhood-heading" class="profile-section-heading">Neighborhood</h2>
+          <div class="profile-card">
+            <h3>Around the school</h3>
+            <p><%= @profile.address.presence || "Street address not provided" %></p>
+            <% if @school.lat && @school.lon %>
+              <div class="profile-location-map"><%= render MapPaneComponent.new(pins: [SearchResult::Pin.new(name: @school.name, rating: @school.summary_rating, lat: @school.lat, lon: @school.lon, kind: :selected)]) %></div>
+              <%= link_to "Open in Google Maps ↗", google_maps_location(@school), target: "_blank", rel: "noopener", class: "profile-text-link" %>
+            <% end %>
+            <% if @profile.district.present? %><p class="profile-muted">District · <%= @profile.district %></p><% end %>
+          </div>
+          <% if @related_schools.any? %>
+            <div class="profile-card profile-more-schools">
+              <h3>Schools from your results</h3>
+              <% @related_schools.each do |school| %>
+                <div class="profile-nearby-school">
+                  <span class="profile-rating-badge profile-rating-small"><%= school.summary_rating || "—" %><small>/10</small></span>
+                  <div><%= link_to school.name, school_profile_path(school.school_id, view: params[:view]) %><p class="profile-muted"><%= school.entity_type.to_s.titleize %> · Grades <%= school.grades %></p></div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </section>
+      </main>
+
+      <aside class="profile-sidebar" aria-label="Your school search">
+        <div class="profile-card">
+          <h3>Your school search</h3>
+          <p>Review school details alongside the priorities that matter to your family.</p>
+          <%= link_to "← Back to school results", @back_path, class: "profile-text-link" %>
+          <%= link_to "View my list", root_path(view: "shortlist"), class: "profile-text-link" %>
+        </div>
+        <div class="profile-card">
+          <h3>School information</h3>
+          <p class="profile-muted">This profile uses synthetic demo data.</p>
+          <% if @profile.updated_on %><p class="profile-muted">Dataset updated <%= @profile.updated_on.strftime("%B %-d, %Y") %>.</p><% end %>
+          <a href="#evidence" class="profile-text-link">See your matching evidence</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <footer class="profile-footer"><div class="profile-shell"><%= link_to "← Return to Guided Search", @back_path %></div></footer>
+</div>

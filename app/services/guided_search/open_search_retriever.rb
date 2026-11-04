@@ -32,18 +32,24 @@ module GuidedSearch
       size = (prefs["size"] || DEFAULT_SIZE).to_i
 
       filters = symbolize(prefs["filters"])
+      required_keys = criteria.select { |criterion| criterion["importance"] == "require" }.pluck("key") - %w[level location]
       hits = @school_search.search(
         text: prefs["query"].to_s,
         filters: filters,
         geo: geo,
-        size: size
+        size: required_keys.empty? ? size : size * GuidedSearch::SchoolSearch::CANDIDATE_MULTIPLIER
       )
 
       # Thread the requested grade level into evidence scoring so a "middle
       # school" requirement reads correctly against each school's level_codes.
       context = { level: filters[:level_codes] }.compact
+      cards = hits.lazy.map { |hit| card(hit, criteria, geo, context) }
+      return cards.first(size) if required_keys.empty?
 
-      hits.map { |hit| card(hit, criteria, geo, context) }
+      cards.select do |result|
+        confirmed_keys = result["criteria"].select { |evidence| evidence["status"] == "confirmed" }.pluck("key")
+        (required_keys - confirmed_keys).empty?
+      end.first(size)
     end
 
     private
@@ -66,7 +72,8 @@ module GuidedSearch
         "why" => nil,                        # agent writes this
         "latlon" => source["latlon"],
         "saved" => false,
-        "criteria" => evidence
+        "criteria" => evidence,
+        "profile" => source.except("embedding", "reviews_text", "reviews_positive", "reviews_negative")
       }
     end
 
