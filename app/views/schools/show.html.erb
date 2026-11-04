@@ -1,22 +1,6 @@
 <% content_for :title, "#{@school.name} | GreatSchools" %>
 <div class="school-profile" data-controller="school-profile">
-  <header class="profile-header">
-    <div class="profile-shell profile-header-row">
-      <%= link_to root_path, class: "profile-logo", aria: { label: "GreatSchools home" } do %>
-        <span>Great<span class="profile-logo-accent">!</span></span><small>SCHOOLS.org</small>
-      <% end %>
-      <%= form_with url: api_search_path(format: :html), class: "profile-search", data: { turbo_frame: "_top" } do |form| %>
-        <%= form.label :message, "Search schools", class: "sr-only" %>
-        <%= form.text_field :message, placeholder: "Find a school for your family", required: true, maxlength: 2000 %>
-        <%= form.button "⌕", aria: { label: "Search" } %>
-      <% end %>
-      <nav aria-label="Main navigation" class="profile-header-links">
-        <%= link_to "Parenting", "https://www.greatschools.org/gk/" %>
-        <%= link_to "Schools by district", "https://www.greatschools.org/best-schools/" %>
-        <%= link_to "My list", root_path(view: "shortlist") %>
-      </nav>
-    </div>
-  </header>
+  <%= render "shared/navigation", search_frame: "_top", search_value: nil, shortlist_count: nil %>
 
   <div class="profile-intro">
     <div class="profile-shell">

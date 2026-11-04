@@ -21,7 +21,7 @@ class SearchOptionsController < ApplicationController
     case params[:change]
     when "refresh"
       GuidedSearch::Turn.new(search_session).refresh(preferences) if search_session.follow_up_questions.empty?
-    when "toggle", "add", "grade"
+    when "toggle", "add", "grade", "remove"
       return redirect_to root_path, status: :see_other unless update_priority(preferences)
 
       if search_session.follow_up_questions.empty?
@@ -57,6 +57,18 @@ class SearchOptionsController < ApplicationController
       end
       preferences["query"] = [Array(preferences["needs"]).join(", "), preferences["grade_level"],
         preferences["location"]].compact_blank.join(" · ")
+    elsif params[:change] == "remove"
+      key = params[:key]
+      return false if key.in?(%w[level location])
+
+      criterion = criteria.find { |existing| existing["key"] == key }
+      return false unless criterion
+
+      criteria.delete(criterion)
+      preferences["needs"] = Array(preferences["needs"]) - [criterion["label"]]
+      preferences["priority_overrides"]&.delete(key)
+      preferences["query"] = [Array(preferences["needs"]).join(", "), preferences["grade_level"],
+        preferences["location"]].compact_blank.join(" · ")
     elsif params[:change] == "add"
       need = params[:need]
       return false unless GuidedSearch::NeedsExtractor::NEEDS.include?(need)
@@ -64,8 +76,11 @@ class SearchOptionsController < ApplicationController
       criterion = GuidedSearch::BedrockAgent.criterion_for(need)
       return false if criteria.any? { |existing| existing["key"] == criterion["key"] }
 
+      criterion["importance"] = "require"
       criteria << criterion
       preferences["needs"] = Array(preferences["needs"]) | [need]
+      (preferences["priority_overrides"] ||= {})[criterion["key"]] = "require"
+      preferences["query"] = [preferences["query"], need].compact_blank.join(" · ")
     else
       key = params[:key]
       return false if key.in?(%w[level location])

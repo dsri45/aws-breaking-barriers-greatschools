@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
   root "home#show"
+  get "chats" => "chat_sessions#index", as: :chats
+  post "chats" => "chat_sessions#create"
+  get "chats/:chat_id" => "home#show", as: :chat
   get "up" => "rails/health#show"
   get "ready" => "health#ready"
   post "search-options" => "search_options#update", as: :search_options

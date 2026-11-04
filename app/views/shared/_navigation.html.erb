@@ -1,0 +1,30 @@
+<header class="gs-navbar">
+  <div class="gs-navbar-inner">
+    <%= link_to root_path, class: "gs-navbar-logo", aria: { label: "GreatSchools home" } do %>
+      <%= image_tag "greatschools-logo.svg", width: 95, height: 40, alt: "GreatSchools" %>
+    <% end %>
+    <%= form_with url: api_search_path(format: :html), method: :post,
+          data: { turbo_frame: search_frame, turbo_action: "replace" }, class: "gs-navbar-search" do |form| %>
+      <%= form.label :message, "Search", for: "search_message", class: "sr-only" %>
+      <%= form.text_field :message, id: "search_message", value: search_value,
+            placeholder: "Find a school for your family", required: true, maxlength: 2000 %>
+      <button type="submit" aria-label="Search" data-turbo-submits-with="…">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></svg>
+      </button>
+    <% end %>
+    <nav aria-label="Main navigation" class="gs-navbar-links">
+      <a href="https://www.greatschools.org/gk/">Parenting</a>
+      <a href="https://www.greatschools.org/school-district-boundaries-map/">Schools by district</a>
+      <a href="https://www.greatschools.org/reviews/">Write a review</a>
+      <details class="gs-navbar-account">
+        <summary aria-label="Your chats and saved schools" title="Your chats and saved schools">
+          <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#d6d8d6"/><circle cx="16" cy="11" r="5" fill="#777c79"/><path d="M5.5 26a10.5 10.5 0 0 1 21 0 15 15 0 0 1-21 0" fill="#777c79"/></svg>
+        </summary>
+        <div>
+          <%= link_to "My list#{shortlist_count.nil? ? '' : " (#{shortlist_count})"}", root_path(view: "shortlist") %>
+          <%= link_to "Chat history", chats_path %>
+        </div>
+      </details>
+    </nav>
+  </div>
+</header>

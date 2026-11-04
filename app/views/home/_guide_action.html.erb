@@ -1,0 +1,4 @@
+<%= button_to label, api_search_path(format: :html),
+      params: { message: message, intent: intent, school_id: school_id, view: view }.compact,
+      form: { data: { turbo_frame: "guided-search", turbo_action: "replace" } },
+      class: "guide-action", data: { turbo_submits_with: "Thinking…" } %>

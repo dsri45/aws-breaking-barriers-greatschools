@@ -67,13 +67,16 @@ module GuidedSearch
       shoulds = build_shoulds(criteria)
       text = criteria[:text].to_s.strip
 
+      text_query = { multi_match: { query: text,
+        fields: ["name^3", "esp_text^2", "reviews_text", "reviews_positive", "city"], type: "best_fields" } }
+      # Exact club metadata determines eligibility; free text only ranks those
+      # schools, so an absent mention in reviews cannot hide a verified club.
+      shoulds << text_query if !text.empty? && criteria.dig(:filters, :reading_club)
       must =
-        if text.empty?
+        if text.empty? || criteria.dig(:filters, :reading_club)
           [{ match_all: {} }]
         else
-          [{ multi_match: { query: text,
-                            fields: ["name^3", "esp_text^2", "reviews_text", "reviews_positive", "city"],
-                            type: "best_fields" } }]
+          [text_query]
         end
 
       { bool: { must: must, filter: filters, should: shoulds } }
@@ -90,6 +93,18 @@ module GuidedSearch
       clauses << term_or_terms(:entity_type, filter[:entity_type])
       clauses << term_or_terms(:level_codes, filter[:level_codes])
       clauses << ({ term: { gifted_talented: filter[:gifted_talented] } } unless filter[:gifted_talented].nil?)
+      if filter[:reading_club] == true
+        names = EvidenceScorer::READING_CLUB_NAMES.flat_map { |name| [name, name.tr("_", " "), name.titleize] }.uniq
+        clauses << { bool: { should: EvidenceScorer::CLUB_FIELDS.map do |field|
+          { terms: { field => names } }
+        end, minimum_should_match: 1 } }
+      end
+      if filter[:ib_offered] == true
+        clauses << { bool: { should: [
+          { term: { ib_offered: true } },
+          { exists: { field: "ib_programs" } }
+        ], minimum_should_match: 1 } }
+      end
 
       rating = {}
       rating[:gte] = filter[:min_summary_rating] if filter[:min_summary_rating]

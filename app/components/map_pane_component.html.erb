@@ -1,51 +1,68 @@
-<% maps_key = google_maps_key %>
+<% maps_key = @pins.any? ? google_maps_key : nil %>
 <section id="map-pane" aria-label="Map of results" class="search-map-pane relative min-h-[380px] w-full shrink-0 overflow-hidden bg-[#ECEFF1] lg:min-h-0 lg:w-[var(--map-width,380px)]"
   <% if maps_key %>
     data-controller="google-map"
-    data-action="turbo:before-cache@document->google-map#reset google-maps:auth-failure@document->google-map#reset"
+    data-action="turbo:before-cache@document->google-map#reset google-maps:auth-failure@document->google-map#reset school-comparison:selection@window->google-map#selectionChanged"
     data-google-map-api-key-value="<%= maps_key %>"
+    data-google-map-selectable-value="<%= @selectable %>"
     data-google-map-pins-value="<%= google_maps_pins.to_json %>"
   <% end %>>
   <% if maps_key %>
     <div class="invisible absolute inset-0" data-google-map-target="canvas"></div>
   <% end %>
+  <% if @pins.empty? %>
+    <div class="absolute inset-0 flex items-center justify-center p-8 text-center">
+      <div><h2 class="font-semibold text-navy">Your school map</h2><p class="mt-2 text-sm text-muted">Matching school locations will appear here when results have coordinates.</p></div>
+    </div>
+  <% else %>
   <div data-google-map-target="fallback">
-    <svg class="absolute inset-0 h-full w-full opacity-40" width="380" height="720" viewBox="0 0 380 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <svg class="absolute inset-0 h-full w-full" width="380" height="720" viewBox="0 0 380 720" preserveAspectRatio="xMidYMid slice" role="group" aria-label="School map preview">
       <rect width="380" height="720" fill="#ECEFF1"/>
       <path d="M0 600 C80 580 120 640 200 630 C280 620 330 680 420 670 L420 720 L0 720 Z" fill="#C7DCEC"/>
       <rect x="250" y="80" width="120" height="90" fill="#D3E6CD"/><rect x="30" y="380" width="90" height="70" fill="#D3E6CD"/>
       <g stroke="#fff" stroke-width="4" fill="none"><path d="M0 140H420M0 250H420M0 500H420M70 0V600M180 0V620M330 0V600"/></g>
       <path d="M0 420 C150 400 260 440 420 400" stroke="#D5DBE1" stroke-width="14" fill="none"/>
       <path d="M0 420 C150 400 260 440 420 400" stroke="#F7E3A6" stroke-width="10" fill="none"/>
-      <% points.each do |pt| %>
-        <% case pt.pin.kind %>
-        <% when :selected %>
-          <g><circle cx="<%= pt.x %>" cy="<%= pt.y %>" r="38" fill="#1F3B57" opacity="0.15"/>
-            <path d="M<%= pt.x %> <%= pt.y + 28 %> l-11 16 h22 z" fill="#1F3B57"/>
-            <circle cx="<%= pt.x %>" cy="<%= pt.y %>" r="28" fill="#1F3B57" stroke="#fff" stroke-width="3"/>
-            <text x="<%= pt.x %>" y="<%= pt.y + 6 %>" text-anchor="middle" font-size="18" font-weight="700" fill="#fff"><%= label(pt.pin) %></text></g>
-        <% when :match %>
-          <g><path d="M<%= pt.x %> <%= pt.y + 20 %> l-9 14 h18 z" fill="<%= pt.pin.rating ? "#4A86C5" : "#fff" %>"/>
-            <circle cx="<%= pt.x %>" cy="<%= pt.y %>" r="22" fill="<%= pt.pin.rating ? "#4A86C5" : "#fff" %>" stroke="<%= pt.pin.rating ? "#fff" : "#8A94A3" %>" stroke-width="3"<%= pt.pin.rating ? "" : ' stroke-dasharray="4 3"'.html_safe %>/>
-            <text x="<%= pt.x %>" y="<%= pt.y + 5 %>" text-anchor="middle" font-size="15" font-weight="700" fill="<%= pt.pin.rating ? "#fff" : "#5B6675" %>"><%= label(pt.pin) %></text></g>
+      <% points.each do |point| %>
+        <% if @selectable && point.pin.school_id %>
+          <a href="#school_<%= point.pin.school_id.tr(' ', '_') %>" role="button" tabindex="0"
+             aria-label="Compare <%= point.pin.name %>" aria-pressed="false"
+             data-school-id="<%= point.pin.school_id %>" data-school-marker
+             data-action="click->school-comparison#selectMarker keydown->school-comparison#selectMarker"
+             class="gs-map-marker" transform="translate(<%= point.x - 20 %> <%= point.y - 20 %>)">
+            <g transform="translate(0 -4)">
+              <path d="M14.26 42.417C6.122 40.019.187 32.547.187 23.701.188 12.92 9.004 4.18 19.878 4.18S39.567 12.92 39.567 23.7c0 8.132-5.014 15.102-12.144 18.038l-6.767 11.575-6.397-10.897z"/>
+              <circle cx="20" cy="23.5" r="18"/>
+              <text x="20" y="29" text-anchor="middle"><%= label(point.pin) %></text>
+            </g>
+          </a>
         <% else %>
-          <g opacity="0.75"><circle cx="<%= pt.x %>" cy="<%= pt.y %>" r="15" fill="#fff" stroke="#8A94A3" stroke-width="1.5"/>
-            <text x="<%= pt.x %>" y="<%= pt.y + 4 %>" text-anchor="middle" font-size="11" font-weight="700" fill="#5B6675"><%= label(pt.pin) %></text></g>
+          <g class="gs-map-marker" transform="translate(<%= point.x - 20 %> <%= point.y - 20 %>)" opacity="<%= point.pin.kind == :other ? 0.55 : 1 %>">
+            <g transform="translate(0 -4)">
+              <path d="M14.26 42.417C6.122 40.019.187 32.547.187 23.701.188 12.92 9.004 4.18 19.878 4.18S39.567 12.92 39.567 23.7c0 8.132-5.014 15.102-12.144 18.038l-6.767 11.575-6.397-10.897z"/>
+              <circle cx="20" cy="23.5" r="18"/>
+              <text x="20" y="29" text-anchor="middle"><%= label(point.pin) %></text>
+            </g>
+          </g>
         <% end %>
       <% end %>
     </svg>
 
-    <div class="search-map-message absolute inset-x-4 top-4 rounded-xl border border-line bg-white/95 p-3 text-sm">
+    <div class="search-map-message absolute inset-x-4 bottom-4 rounded-xl border border-line bg-white/95 p-3 text-sm">
       <p class="font-semibold text-navy"><%= maps_key ? "Interactive Google Maps is loading or unavailable." : "Interactive Google Maps is not configured." %></p>
       <% if @pins.any? %>
-        <ul class="mt-2 max-h-44 space-y-1 overflow-y-auto">
-          <% @pins.reject { |pin| pin.kind == :other }.each do |pin| %>
-            <li><%= link_to "Open #{pin.name} in Google Maps", helpers.google_maps_location(pin), target: "_blank", rel: "noopener", class: "font-semibold text-blue underline" %></li>
-          <% end %>
-        </ul>
+        <details class="mt-2">
+          <summary class="cursor-pointer font-semibold text-blue">Open school locations in Google Maps</summary>
+          <ul class="mt-2 max-h-44 space-y-1 overflow-y-auto">
+            <% @pins.reject { |pin| pin.kind == :other }.each do |pin| %>
+              <li><%= link_to pin.name, helpers.google_maps_location(pin), target: "_blank", rel: "noopener", class: "font-semibold text-blue underline" %></li>
+            <% end %>
+          </ul>
+        </details>
       <% else %>
         <p class="mt-2 text-muted">School locations appear here when results have coordinates.</p>
       <% end %>
     </div>
   </div>
+  <% end %>
 </section>

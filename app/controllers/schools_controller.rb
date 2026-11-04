@@ -25,10 +25,6 @@ class SchoolsController < ApplicationController
     shortlist = search_session ? search_session.shortlist_entries.order(:id).to_a : []
     show_shortlist = params[:view] == "shortlist"
     @back_path = show_shortlist ? root_path(view: "shortlist") : root_path
-    @available_schools = if !show_shortlist && search_session&.history.blank?
-      SearchResult.sample.schools
-    else
-      SearchResult.from_session(search_session, shortlist: shortlist, show_shortlist: show_shortlist).schools
-    end
+    @available_schools = SearchResult.from_session(search_session, shortlist: shortlist, show_shortlist: show_shortlist).schools
   end
 end

@@ -5,7 +5,11 @@ class SearchResult
 
   Criterion = Data.define(:key, :label, :importance)
   Evidence  = Data.define(:key, :label, :status, :evidence, :as_of)
-  Pin       = Data.define(:name, :rating, :lat, :lon, :kind)
+  Pin = Data.define(:name, :rating, :lat, :lon, :kind, :school_id) do
+    def initialize(name:, rating:, lat:, lon:, kind:, school_id: nil)
+      super
+    end
+  end
 
   School = Data.define(:school_id, :rank_label, :name, :entity_type, :grades,
                        :distance_mi, :summary_rating, :avg_review_rating,
@@ -23,7 +27,7 @@ class SearchResult
   def self.from_session(search_session, shortlist:, show_shortlist:)
     preferences = search_session&.preferences || {}
     messages = Array(search_session&.history).map do |message|
-      { "role" => message.fetch("role"), "text" => message.fetch("content") }
+      { "role" => message.fetch("role"), "text" => message.fetch("content"), "school_ids" => Array(message["school_ids"]) }
     end
     latest_reply = messages.last&.fetch("text").to_s
     Array(search_session&.follow_up_questions).each do |question|
@@ -33,7 +37,7 @@ class SearchResult
     end
 
     saved_ids = shortlist.map(&:school_id).to_set
-    schools = show_shortlist ? shortlist.map(&:school) : Array(search_session&.results)
+    schools = show_shortlist ? shortlist.map(&:school) : Array(search_session&.matching_results)
     new(
       "query" => preferences["query"],
       "grade_level" => preferences["grade_level"],
@@ -63,7 +67,7 @@ class SearchResult
       next unless s.lat && s.lon
 
       Pin.new(name: s.name, rating: s.summary_rating, lat: s.lat, lon: s.lon,
-              kind: i.zero? ? :selected : :match)
+              kind: i.zero? ? :selected : :match, school_id: s.school_id)
     end + unmatched
   end
 

@@ -1,77 +1,74 @@
-<article class="<%= card_classes %>" id="school_<%= @school.school_id.tr(" ", "_") %>" data-school-id="<%= @school.school_id %>">
-  <div class="search-school-illustration relative shrink-0 overflow-hidden rounded-[10px] bg-[#DCE7F2]">
-    <%# Placeholder campus illustration. Replace with a Nova Canvas image from S3 (see tech doc). %>
-    <svg width="140" height="126" viewBox="0 0 168 150" aria-hidden="true">
-      <rect y="108" width="168" height="42" fill="#CFE3C6"/><circle cx="140" cy="30" r="12" fill="#F3E3B5"/>
-      <rect x="24" y="56" width="120" height="58" fill="#E7D9C4"/><path d="M18 58 L84 30 L150 58 Z" fill="#8C5A3C"/>
-      <rect x="36" y="68" width="16" height="14" fill="#9FB8CF"/><rect x="60" y="68" width="16" height="14" fill="#9FB8CF"/>
-      <rect x="92" y="68" width="16" height="14" fill="#9FB8CF"/><rect x="116" y="68" width="16" height="14" fill="#9FB8CF"/>
-      <rect x="36" y="90" width="16" height="14" fill="#9FB8CF"/><rect x="116" y="90" width="16" height="14" fill="#9FB8CF"/>
-      <rect x="74" y="86" width="20" height="28" fill="#6B4A36"/><rect x="84" y="10" width="2" height="22" fill="#5B6675"/>
-      <rect x="86" y="10" width="14" height="9" fill="#2F6FB0"/><circle cx="14" cy="104" r="12" fill="#9CC48F"/><circle cx="156" cy="102" r="14" fill="#9CC48F"/>
-    </svg>
-    <span class="absolute bottom-2 left-2 rounded bg-white/90 px-1.5 py-0.5 text-[11px] font-semibold">Illustration</span>
+<article class="gs-school-card" id="school_<%= @school.school_id.tr(" ", "_") %>"
+         data-school-id="<%= @school.school_id %>" data-school-comparison-target="card"
+         <%= tag.attributes(tabindex: 0, aria: { label: "Select #{@school.name} for comparison", describedby: "comparison-status" }) if @allow_comparison %>>
+  <% profile_path = helpers.school_profile_path(@school.school_id, view: ("shortlist" if @show_shortlist)) %>
+  <div class="gs-card-heading">
+    <div>
+      <h2><%= link_to @school.name, profile_path %></h2>
+      <% if profile.address.present? %><p class="gs-card-address"><%= profile.address %></p><% end %>
+    </div>
+    <% if @school.rated? %>
+      <div class="gs-card-rating" aria-label="Rated <%= @school.summary_rating %> out of 10"><span><%= @school.summary_rating %></span><small>/10</small></div>
+    <% else %>
+      <div class="gs-card-unrated">No rating yet</div>
+    <% end %>
+  </div>
+
+  <% if @school.avg_review_rating || @school.review_count %>
+    <div class="gs-card-reviews">
+      <% if @school.avg_review_rating %><span aria-hidden="true" class="gs-review-star">★</span><span><%= @school.avg_review_rating %> /5</span><% end %>
+      <% if @school.review_count %><%= link_to "(#{pluralize(@school.review_count, 'Review')})", "#{profile_path}#reviews" %><% end %>
+    </div>
+  <% end %>
+
+  <ul class="gs-card-badges" aria-label="School facts">
+    <% grade_labels.each do |label| %><li><%= label %></li><% end %>
+    <% if @school.entity_type.present? %><li><%= ENTITY_LABELS.fetch(@school.entity_type, @school.entity_type.titleize) %></li><% end %>
+  </ul>
+
+  <% if rating_factors.any? %>
+    <dl class="gs-card-factors">
+      <% rating_factors.each do |label, rating| %>
+        <div><dt><%= label %></dt><dd><span><%= rating %></span><small>/10</small></dd></div>
+      <% end %>
+    </dl>
+  <% end %>
+
+  <% if @school.why.present? %>
+    <p class="gs-card-highlight">
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M3 23h7l5-5h7c3 0 3 4 0 4h-6m-5 1 5 4h6l8-8M3 21v9h7v-9zm14-7V5m0 4c-6 0-7-5-7-7 5 0 7 2 7 7zm0 5c0-6 4-8 9-8 0 5-3 8-9 8z"/></svg>
+      <%= @school.why %>
+    </p>
+  <% end %>
+
+  <% if @school.criteria.any? %>
+    <details class="gs-card-evidence">
+      <summary>Your priority matches</summary>
+      <ul><% @school.criteria.each do |evidence| %><%= render CriterionRowComponent.new(evidence:) %><% end %></ul>
+      <p><%= data_date %> · <%= link_to "Evidence details", "#{profile_path}#evidence" %></p>
+    </details>
+  <% end %>
+
+  <div class="gs-card-actions">
     <% saved = @allow_saving && @school.saved %>
-    <% label = saved ? "Remove from my list" : "Save to my list" %>
     <% action = saved ? helpers.api_shortlist_path(@school.school_id, format: :html) : helpers.api_shortlist_index_path(format: :html) %>
-    <%= button_to action, method: (saved ? :delete : :post),
+    <%= button_to action, method: saved ? :delete : :post,
           params: { school_id: @school.school_id, view: ("shortlist" if @show_shortlist) }.compact,
-          form_class: "absolute right-2 top-2",
-          disabled: !@allow_saving, aria: { label: label, pressed: saved },
-          class: "flex size-[34px] items-center justify-center rounded-full bg-white disabled:opacity-50" do %>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="<%= saved ? "#D64545" : "none" %>" stroke="<%= saved ? "#D64545" : "#3D4756" %>" stroke-width="2" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3.4 5 7 5c2 0 3.4 1 5 2.8C13.6 6 15 5 17 5c3.6 0 5.8 3.6 4.5 6.8C19.5 16.4 12 21 12 21z"/></svg>
+          disabled: !@allow_saving, aria: { label: saved ? "Remove from my list" : "Save to my list", pressed: saved },
+          class: "gs-card-save" do %>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="<%= saved ? 'currentColor' : 'none' %>" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3.4 5 7 5c2 0 3.4 1 5 2.8C13.6 6 15 5 17 5c3.6 0 5.8 3.6 4.5 6.8C19.5 16.4 12 21 12 21z"/></svg>
+      <%= saved ? "Saved" : "Save" %>
+    <% end %>
+    <%= link_to profile_path, class: "gs-card-profile" do %>View full profile <span aria-hidden="true">›</span><% end %>
+    <% if @allow_comparison %>
+      <label class="gs-card-compare"><%= check_box_tag "ids[]", @school.school_id, false, id: nil, form: "compare-schools",
+            data: { school_comparison_target: "checkbox" }, aria: { label: "Compare #{@school.name}" } %>Compare</label>
     <% end %>
   </div>
-
-  <div class="search-school-content flex min-w-[min(100%,220px)] flex-1 flex-col gap-1.5">
-    <div class="flex items-start gap-2.5">
-      <div class="min-w-0 flex-1">
-        <div class="text-xs font-semibold uppercase tracking-wide text-muted"><%= @school.rank_label %></div>
-        <h2 class="search-school-name mt-0.5 text-lg font-bold"><%= link_to @school.name, helpers.school_profile_path(@school.school_id, view: ("shortlist" if @show_shortlist)) %></h2>
-        <div class="mt-0.5 text-[13px] text-muted"><%= meta %></div>
-      </div>
-      <% if @school.rated? %>
-        <div class="profile-rating-badge search-school-rating" aria-label="Rated <%= @school.summary_rating %> out of 10">
-          <span><%= @school.summary_rating %></span><small>/10</small>
-        </div>
-      <% else %>
-        <div class="flex size-14 shrink-0 items-center justify-center rounded-full border-[1.5px] border-dashed text-center text-[11px] font-semibold leading-tight text-muted" style="border-color:#8A94A3">No rating yet</div>
-      <% end %>
+  <% if @allow_saving %>
+    <div class="gs-card-guide-actions" aria-label="Ask about <%= @school.name %>">
+      <%= helpers.render "home/guide_action", label: "Why this school?", message: "Why was #{@school.name} chosen for my priorities?", intent: "explain_school", school_id: @school.school_id, view: ("shortlist" if @show_shortlist) %>
+      <%= helpers.render "home/guide_action", label: "Plan a school visit", message: "What should I ask on a visit to #{@school.name}?", intent: "visit_questions", school_id: @school.school_id, view: ("shortlist" if @show_shortlist) %>
     </div>
-
-    <% if @school.avg_review_rating || @school.review_count %>
-      <div class="search-school-reviews flex flex-wrap items-center gap-2 text-[13px] text-ink-2">
-        <% if @school.avg_review_rating %>
-          <span class="profile-stars" style="--review-percent: <%= (@school.avg_review_rating.to_f / 5.0 * 100).round %>%" aria-hidden="true">★★★★★</span>
-          <span><%= @school.avg_review_rating %></span>
-        <% end %>
-        <% if @school.review_count %><span><%= pluralize(@school.review_count, "review") %></span><% end %>
-        <% if @school.review_topic.present? %><span><%= @school.review_topic %></span><% end %>
-      </div>
-    <% end %>
-
-    <% if @school.why.present? %>
-      <p class="text-sm leading-snug"><mark class="rounded bg-highlight px-1 py-px font-medium text-ink"><%= @school.why %></mark></p>
-    <% end %>
-
-    <ul class="search-school-evidence mt-1 flex flex-col gap-1.5">
-      <% @school.criteria.each do |evidence| %>
-        <%= render CriterionRowComponent.new(evidence:) %>
-      <% end %>
-    </ul>
-
-    <div class="search-school-actions mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
-      <% profile = helpers.school_profile_path(@school.school_id, view: ("shortlist" if @show_shortlist)) %>
-      <%= link_to "I checked this for you ›", "#{profile}#evidence", class: "font-semibold text-blue hover:text-navy" %>
-      <span class="text-muted"><%= data_date %></span>
-      <% if @allow_comparison %>
-        <label class="ml-auto flex items-center gap-1.5 text-ink-2">
-          <%= check_box_tag "ids[]", @school.school_id, false, id: nil, form: "compare-schools", class: "size-4",
-                data: { school_comparison_target: "checkbox" }, aria: { label: "Compare #{@school.name}" } %>
-          Compare
-        </label>
-      <% end %>
-      <%= link_to "View profile", profile, class: "font-semibold text-blue hover:text-navy" %>
-    </div>
-  </div>
+  <% end %>
 </article>

@@ -9,7 +9,8 @@ module GuidedSearch
     end
 
     def reply(guidance:, results:)
-      "Demo search returned #{results.size} synthetic school. #{guidance.fetch(:follow_up_questions).join(" ")}".strip
+      [SchoolGuide.recommendations(preferences: guidance.fetch(:preferences), results: results),
+       *guidance.fetch(:follow_up_questions)].join("\n\n")
     end
   end
 end

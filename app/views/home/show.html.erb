@@ -1,31 +1,11 @@
 <% content_for :title, "Guided Search" %>
 
-<turbo-frame id="guided-search" target="_top" class="guided-search-page flex min-h-dvh flex-col lg:h-dvh lg:overflow-hidden">
+<turbo-frame id="guided-search" target="_top"
+  data-controller="school-comparison chat-scroll"
+  data-school-comparison-chat-id-value="<%= @active_chat_id || 'preview' %>"
+  data-action="change->school-comparison#update click->school-comparison#selectCard keydown->school-comparison#keySelect google-map:select->school-comparison#selectMap google-map:ready->school-comparison#update submit->chat-scroll#guard turbo:submit-start->chat-scroll#start turbo:submit-end->chat-scroll#finish turbo:before-frame-render->chat-scroll#beforeRender wheel->chat-scroll#reading touchmove->chat-scroll#reading keydown->chat-scroll#reading" class="guided-search-page flex min-h-dvh flex-col lg:h-dvh lg:overflow-hidden">
   <h1 class="sr-only">GreatSchools Guided Search</h1>
-  <header class="search-header shrink-0 bg-white">
-    <div class="profile-header-row search-header-row">
-      <%= link_to root_path, class: "profile-logo", aria: { label: "GreatSchools home" } do %>
-        <span>Great<span class="profile-logo-accent">!</span></span><small>SCHOOLS.org</small>
-      <% end %>
-      <%= form_with url: api_search_path(format: :html), method: :post,
-            data: { turbo_frame: "guided-search", turbo_action: "replace" }, class: "profile-search search-header-form" do |f| %>
-        <%= f.label :message, "Search", for: "search_message", class: "sr-only" %>
-        <%= f.text_field :message, id: "search_message", value: @search.query, required: true, maxlength: 2000,
-              placeholder: "Find a school for your family" %>
-        <button type="submit" aria-label="Search" data-turbo-submits-with="…">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-        </button>
-      <% end %>
-      <nav class="profile-header-links" aria-label="Main navigation">
-        <a href="https://www.greatschools.org/gk/">Parenting</a>
-        <a href="https://www.greatschools.org/best-schools/">Schools by district</a>
-        <%= link_to root_path(view: "shortlist"), class: "search-my-list" do %>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3.4 5 7 5c2 0 3.4 1 5 2.8C13.6 6 15 5 17 5c3.6 0 5.8 3.6 4.5 6.8C19.5 16.4 12 21 12 21z"/></svg>
-          My list (<%= @shortlist_count %>)
-        <% end %>
-      </nav>
-    </div>
-  </header>
+  <%= render "shared/navigation", search_frame: "guided-search", search_value: (@show_preview ? nil : @search.query), shortlist_count: @shortlist_count %>
 
   <% if flash[:alert] %>
     <p role="alert" class="shrink-0 border-b border-line bg-blue-soft px-7 py-2 text-sm text-navy"><%= flash[:alert] %></p>
@@ -44,12 +24,17 @@
           <%= criterion.label %><span aria-hidden="true">×</span>
         <% end %>
       <% elsif @editable_priorities && !filter %>
+        <div class="inline-flex items-center gap-1">
         <%= button_to search_options_path, params: { change: "toggle", key: criterion.key },
               form: { data: { turbo_frame: "guided-search" } },
               class: style, aria: { pressed: required }, title: required ? "Make this nice to have" : "Make this a must-have" do %>
           <span class="search-priority-importance rounded-md bg-ground px-1.5 text-[11px] font-bold"><%= required ? "MUST" : "NICE" %></span>
           <%= criterion.label %>
         <% end %>
+        <%= button_to "×", search_options_path, params: { change: "remove", key: criterion.key },
+              form: { data: { turbo_frame: "guided-search" } }, class: "px-1 text-muted",
+              aria: { label: "Remove priority #{criterion.label}" } %>
+        </div>
       <% elsif @editable_priorities %>
         <%= link_to criterion.label, "#follow_up_message", class: style, data: { turbo: false },
               aria: { label: "Change #{criterion.key == 'level' ? 'grade' : 'location'} in chat" } %>
@@ -77,74 +62,126 @@
           <%= f.submit "+ Add priority", class: "h-[34px] rounded-full border border-dashed border-line-2 bg-white px-3 text-sm font-medium" %>
         <% end %>
       <% end %>
-      <span class="text-[13px] text-muted">Toggle nice-to-have and must-have</span>
+      <span class="text-[13px] text-muted">Program requests always need evidence · MUST filters · NICE ranks</span>
     <% elsif @show_preview %>
-      <span class="text-[13px] text-muted">Run a search to edit priorities.</span>
+      <span class="text-[13px] text-muted">No preferences selected yet. Tell your guide what matters.</span>
     <% end %>
   </div>
 
   <div class="flex min-h-0 flex-1 flex-col lg:flex-row" data-controller="pane-layout">
     <%# ── Left: chat ─────────────────────────────────────────── %>
-    <aside id="chat-pane" class="search-chat flex h-[460px] w-full shrink-0 flex-col bg-white lg:h-auto lg:w-[var(--chat-width,360px)]">
+    <aside id="chat-pane" data-controller="chat-prompts" data-guide-welcome="<%= @show_preview %>" class="search-chat flex h-[600px] w-full shrink-0 flex-col bg-white lg:h-auto lg:w-[var(--chat-width,360px)]">
       <div class="search-chat-header flex items-center gap-2.5 border-b border-line px-5 py-3.5">
-        <h2 class="search-section-title">School guide</h2>
+        <div><h2 class="search-section-title">School guide</h2><span class="guide-identity">AI guide · A thoughtful look at school fit</span></div>
         <% grade = @search.criteria.find { |criterion| criterion.key == "level" } %>
-        <span class="search-grade-label ml-auto flex h-[30px] items-center rounded-lg border border-line px-2.5 text-[13px] text-ink-2"><%= @search.grade_level || grade&.label || "Grade not set" %></span>
+        <span class="search-grade-label ml-auto flex h-[30px] items-center rounded-lg border border-line px-2.5 text-[13px] text-ink-2"><%= @show_preview ? "New chat" : (@search.grade_level || grade&.label || "Grade not set") %></span>
       </div>
+      <nav aria-label="Chat sessions" class="flex shrink-0 items-center gap-4 border-b border-line px-5 py-2 text-sm">
+        <%= button_to "+ New chat", chats_path, class: "font-semibold text-blue", form: { data: { turbo_frame: "_top" } } %>
+        <%= link_to "Chat history", chats_path, class: "font-semibold text-blue", data: { turbo_frame: "_top" } %>
+      </nav>
 
-      <div id="messages" <%= tag.attributes(data: { controller: "chat-scroll" }) unless @show_preview %>
+      <div id="messages"
            class="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
-        <% @search.messages.each do |m| %>
-          <% case m["role"] %>
-          <% when "user" %>
-            <div class="search-chat-message max-w-[290px] self-end rounded-2xl rounded-br-sm bg-[#EEF1F4] px-4 py-3 text-[15px] leading-snug"><%= m["text"] %></div>
-          <% when "assistant" %>
-            <p class="search-chat-reply text-[15px] leading-relaxed"><%= highlight_phrases(m["text"], m["highlights"]) %></p>
-          <% when "question" %>
-            <%= render QuestionCardComponent.new(text: m["text"], options: m["options"], hint: m["hint"], selected: m["selected"]) %>
-          <% when "status" %>
-            <ul class="search-chat-status flex flex-col gap-2 rounded-[10px] bg-[#F7F8FA] px-3.5 py-3 text-[13px] text-ink-2">
-              <% m["steps"].each do |step| %>
-                <li class="flex items-center gap-2">
-                  <% if step["state"] == "done" %>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1E7F4E" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+        <% if @show_preview %>
+          <%= render "guide_welcome" %>
+        <% else %>
+          <% latest_reply_index = @search.messages.rindex { |message| message["role"] == "assistant" } %>
+          <% @search.messages.each_with_index do |m, message_index| %>
+            <% case m["role"] %>
+            <% when "user" %>
+              <div data-chat-message-key="<%= Digest::SHA256.hexdigest("user:#{m['text']}") %>" class="search-chat-message max-w-[290px] self-end rounded-2xl rounded-br-sm bg-[#EEF1F4] px-4 py-3 text-[15px] leading-snug"><%= m["text"] %></div>
+            <% when "assistant" %>
+              <div class="guide-response" data-chat-message-key="<%= Digest::SHA256.hexdigest("assistant:#{m['text']}") %>" <%= tag.attributes(data: { guide_latest_response: true }) if message_index == latest_reply_index %>>
+                <span class="guide-response-label">Your school guide</span>
+                <% m["text"].split("\n\n").each do |paragraph| %>
+                  <% heading, body = paragraph.split("\n", 2) %>
+                  <% if body && !heading.start_with?("•") %>
+                    <section class="guide-spotlight">
+                      <h3><%= heading %></h3>
+                      <p><%= highlight_phrases(body, m["highlights"]) %></p>
+                    </section>
                   <% else %>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B26A00" stroke-width="2.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+                    <p><%= highlight_phrases(paragraph, m["highlights"]) %></p>
                   <% end %>
-                  <%= step["text"] %>
-                </li>
-              <% end %>
-            </ul>
+                <% end %>
+                <% if message_index == latest_reply_index %>
+                  <% sources = @search.schools.select { |school| Array(m["school_ids"]).include?(school.school_id) } %>
+                  <% if sources.any? %>
+                    <div class="guide-sources">
+                      <span>School evidence</span>
+                      <% sources.each do |school| %>
+                        <%= link_to school.name, school_profile_path(school.school_id, view: ("shortlist" if @show_shortlist), anchor: "evidence") %>
+                      <% end %>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            <% when "question" %>
+              <%= render QuestionCardComponent.new(text: m["text"], options: m["options"], hint: m["hint"], selected: m["selected"]) %>
+            <% when "status" %>
+              <ul class="search-chat-status flex flex-col gap-2 rounded-[10px] bg-[#F7F8FA] px-3.5 py-3 text-[13px] text-ink-2">
+                <% m["steps"].each do |step| %>
+                  <li class="flex items-center gap-2">
+                    <% if step["state"] == "done" %>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1E7F4E" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+                    <% else %>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B26A00" stroke-width="2.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>
+                    <% end %>
+                    <%= step["text"] %>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          <% end %>
+          <% answers = school_guide_answers(@guide_preferences, @guide_questions) %>
+          <% if answers.any? %>
+            <%= render QuestionCardComponent.new(text: nil, options: answers, hint: "Choose an answer, or write your own below.") %>
+          <% elsif @guide_questions.empty? && @search.schools.any? %>
+            <div class="guide-next">
+              <p>Where shall we look a little closer?</p>
+              <%= render "guide_action", label: "Why these schools?", message: "Explain why these schools were chosen for my priorities.", intent: "explain_results", school_id: nil, view: ("shortlist" if @show_shortlist) %>
+              <% school = @search.schools.first %>
+              <%= render "guide_action", label: "Questions for a school visit", message: "What should I ask on a visit to #{school.name}?", intent: "visit_questions", school_id: school.school_id, view: ("shortlist" if @show_shortlist) %>
+              <button type="button" class="guide-action" data-action="chat-prompts#priorities">Adjust my priorities</button>
+            </div>
+          <% elsif @guide_questions.empty? && @editable_priorities %>
+            <div class="guide-next">
+              <p>Let's try another angle.</p>
+              <button type="button" class="guide-action" data-action="chat-prompts#fill" data-chat-prompts-message-param="Search schools in ">Choose another location</button>
+              <button type="button" class="guide-action" data-action="chat-prompts#priorities">Review my priorities</button>
+            </div>
           <% end %>
         <% end %>
       </div>
 
-      <div class="search-chat-composer shrink-0 border-t border-line px-5 pb-[18px] pt-3.5">
-        <%= form_with url: api_search_path(format: :html), method: :post,
-              data: { turbo_frame: "guided-search", turbo_action: "replace" },
-              class: "search-chat-form flex h-14 items-center gap-2.5 rounded-full border-[1.5px] border-navy pl-4 pr-1.5" do |f| %>
-          <%= f.label :message, "Chat message", for: "follow_up_message", class: "sr-only" %>
-          <%= f.text_field :message, id: "follow_up_message", required: true, maxlength: 2000, placeholder: "Ask about schools",
-                class: "min-w-0 flex-1 border-0 bg-transparent p-0 text-sm focus:ring-0 focus:outline-none" %>
-          <button type="submit" data-turbo-submits-with="Sending…" class="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-navy px-3 text-sm font-semibold text-white">
-            <span>Send</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
-          </button>
-        <% end %>
-      </div>
+      <% unless @show_preview %>
+        <div class="search-chat-composer shrink-0 border-t border-line px-5 pb-[18px] pt-3.5">
+          <%= form_with url: api_search_path(format: :html), method: :post,
+                data: { turbo_frame: "guided-search", turbo_action: "replace" },
+                class: "search-chat-form flex h-14 items-center gap-2.5 rounded-full border-[1.5px] border-navy pl-4 pr-1.5" do |f| %>
+            <%= f.label :message, "Chat message", for: "follow_up_message", class: "sr-only" %>
+            <%= f.text_field :message, id: "follow_up_message", required: true, maxlength: 2000, placeholder: "Ask about schools",
+                  class: "min-w-0 flex-1 border-0 bg-transparent p-0 text-sm focus:ring-0 focus:outline-none" %>
+            <button type="submit" data-turbo-submits-with="Sending…" class="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-navy px-3 text-sm font-semibold text-white">
+              <span>Send</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
     </aside>
 
     <%= render "pane_separator", pane: "chat", label: "Resize chat and school results" %>
 
     <%# ── Middle: ranked school cards ────────────────────────── %>
-    <main class="search-results flex min-w-0 flex-1 flex-col" data-controller="school-comparison" data-action="change->school-comparison#update">
+    <main class="search-results flex min-w-0 flex-1 flex-col">
       <div class="search-results-header flex flex-wrap items-center gap-x-4 gap-y-2 px-6 pb-3 pt-[18px]">
         <% if @show_shortlist %>
           <h2 class="search-section-title">My list</h2>
           <%= link_to "Back to search", root_path, class: "text-sm font-semibold text-blue" %>
         <% elsif @show_preview %>
-          <h2 class="search-section-title"><%= pluralize(@search.schools.size, "sample school") %> near Woodstock, GA</h2>
-          <p class="text-sm text-muted">Run a search to save results.</p>
+          <h2 class="search-section-title">Find your school fit</h2>
         <% else %>
           <h2 class="search-section-title"><%= pluralize(@search.schools.size, "school result") %></h2>
         <% end %>
@@ -156,7 +193,8 @@
                     data: { school_comparison_target: "submit" },
                     class: "h-9 rounded-lg border border-line-2 bg-white px-3 text-sm font-medium disabled:opacity-50" %>
             <% end %>
-            <p aria-live="polite" class="text-xs text-muted" data-school-comparison-target="status">Select at least two schools.</p>
+            <button type="button" hidden data-school-comparison-target="clear" data-action="school-comparison#clear" class="h-9 border border-line-2 px-3 text-sm">Clear selection</button>
+            <p id="comparison-status" aria-live="polite" class="text-xs text-muted" data-school-comparison-target="status">Select cards or map pins to compare.</p>
           <% end %>
           <% if @can_refresh %>
             <%= button_to "Refresh unsaved results", search_options_path, params: { change: "refresh" },
@@ -171,8 +209,10 @@
           <p class="text-sm text-muted">
             <% if @show_shortlist %>
               Your list is empty.
-            <% elsif @can_refresh && @search.criteria.any? { |criterion| criterion.importance == "require" && !criterion.key.in?(%w[level location]) } %>
-              No results confirmed every must-have priority. Try making one of them nice-to-have.
+            <% elsif @show_preview %>
+              Start with your location, your child's grade, and what matters to your family. Schools with confirmed evidence will appear here.
+            <% elsif @can_refresh && GuidedSearch::EvidenceScorer.required_keys(@guide_preferences["criteria"]).any? %>
+              No schools have published evidence for all requested programs and must-have priorities. Try another location or change your priorities.
             <% else %>
               No school results for this turn.
             <% end %>
@@ -180,7 +220,7 @@
         <% end %>
         <% @search.schools.each_with_index do |school, i| %>
           <%= render SchoolCardComponent.new(school:, selected: i.zero?, allow_saving: !@show_preview,
-                show_shortlist: @show_shortlist, allow_comparison: @search.schools.size > 1) %>
+                show_shortlist: @show_shortlist, allow_comparison: true) %>
         <% end %>
 
         <% if @editable_priorities && @search.criteria.any? %>
@@ -199,6 +239,6 @@
 
     <%# ── Right: map ─────────────────────────────────────────── %>
     <%= render "pane_separator", pane: "map", label: "Resize map and school results" %>
-    <%= render MapPaneComponent.new(pins: @search.pins) %>
+    <%= render MapPaneComponent.new(pins: @search.pins, selectable: true) %>
   </div>
 </turbo-frame>

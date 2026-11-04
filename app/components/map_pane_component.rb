@@ -6,15 +6,16 @@ class MapPaneComponent < ViewComponent::Base
 
   Point = Data.define(:pin, :x, :y)
 
-  def initialize(pins:)
+  def initialize(pins:, selectable: false)
     @pins = pins
+    @selectable = selectable
   end
 
   def google_maps_key = ENV["GOOGLE_MAPS_API_KEY"].presence
 
   def google_maps_pins
     @pins.map do |pin|
-      { lat: pin.lat, lng: pin.lon, name: pin.name, rating: pin.rating, kind: pin.kind }
+      { lat: pin.lat, lng: pin.lon, name: pin.name, rating: pin.rating, kind: pin.kind, schoolId: pin.school_id }
     end
   end
 

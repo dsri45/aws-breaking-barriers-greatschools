@@ -1,9 +1,11 @@
 <div class="rounded-xl border-[1.5px] border-blue bg-[#F5F9FD] p-4">
-  <p class="mb-1 text-[15px] font-semibold leading-snug"><%= @text %></p>
+  <% if @text.present? %><p class="mb-1 text-[15px] font-semibold leading-snug"><%= @text %></p><% end %>
   <% if @hint %><p class="mb-3 text-[13px] text-muted"><%= @hint %></p><% end %>
   <div class="flex flex-wrap gap-2">
     <% @options.each do |option| %>
-      <span class="<%= option_classes(option) %>"><%= option %><%= " ✓" if option == @selected %></span>
+      <%= button_to option, helpers.api_search_path(format: :html),
+            params: { message: option }, form: { data: { turbo_frame: "guided-search", turbo_action: "replace" } },
+            class: option_classes(option), aria: { pressed: option == @selected } %>
     <% end %>
   </div>
 </div>

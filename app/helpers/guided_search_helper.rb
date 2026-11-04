@@ -1,4 +1,18 @@
 module GuidedSearchHelper
+  def school_guide_answers(preferences, questions)
+    return [] if questions.empty?
+
+    if preferences["location"].blank?
+      SchoolProfile.seed_schools.values.map { |school| "#{school['city']}, #{school['state']}" }.uniq.first(3)
+    elsif preferences["grade_level"].blank?
+      ["Elementary school", "Middle school", "High school", "Any grade"]
+    elsif Array(preferences["needs"]).empty?
+      ["Highly rated", "Sports programs", "Small class sizes"]
+    else
+      []
+    end
+  end
+
   def google_maps_location(location)
     "https://www.google.com/maps/search/?#{ { api: 1, query: "#{location.lat},#{location.lon}" }.to_query }"
   end

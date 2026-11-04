@@ -19,9 +19,23 @@ module Api
           "Enter a message between 1 and 2,000 characters.")
       end
 
-      turn = GuidedSearch::Turn.new(current_search_session).call(message.strip)
+      intent = params[:intent].presence
+      unless intent.nil? || intent.in?(%w[explain_results explain_school visit_questions])
+        return render_error("invalid_intent", :unprocessable_content, "Choose a school guide action.")
+      end
+      if intent.in?(%w[explain_school visit_questions]) && !params[:school_id].is_a?(String)
+        return render_error("invalid_school_id", :unprocessable_content, "Choose a school to ask about.")
+      end
+      service = GuidedSearch::Turn.new(current_search_session)
+      turn = if intent
+        service.detail(message: message.strip, intent: intent, school_id: params[:school_id], shortlist: params[:view] == "shortlist")
+      else
+        service.call(message.strip)
+      end
+      return render_error("school_not_in_results", :not_found, "That school is no longer in your results or saved list.") unless turn
       if request.format.html?
-        redirect_to root_path, status: :see_other
+        destination = search_return_path(view: ("shortlist" if intent && params[:view] == "shortlist"))
+        redirect_to destination, status: :see_other
       else
         render json: turn
       end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_03_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_000000) do
   create_table "search_sessions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.json "history", null: false
     t.json "preferences", null: false
@@ -19,6 +19,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_000000) do
     t.integer "lock_version", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "browser_token_digest", limit: 64
+    t.index ["browser_token_digest", "updated_at"], name: "index_search_sessions_on_browser_token_digest_and_updated_at"
   end
 
   create_table "shortlist_entries", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|

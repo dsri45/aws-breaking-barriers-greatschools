@@ -2,7 +2,7 @@
 
 /* Guided Search palette (matches the hi-fi mockup). */
 @theme {
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
   --color-ink: #1A2433;
   --color-ink-2: #3D4756;
   --color-muted: #5B6675;
@@ -37,74 +37,6 @@
   max-width: 1280px;
   margin-inline: auto;
   padding-inline: 64px;
-}
-.profile-header {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  background: #fff;
-}
-.profile-header-row {
-  display: flex;
-  align-items: center;
-  min-height: 74px;
-  gap: 28px;
-}
-.profile-logo {
-  display: flex;
-  flex-direction: column;
-  color: #535b5f !important;
-  font-weight: 800;
-  line-height: .85;
-  flex-shrink: 0;
-  font-size: 30px;
-  letter-spacing: -1.5px;
-}
-.profile-logo small {
-  margin-top: 2px;
-  color: #4e9dc4;
-  letter-spacing: -.3px;
-  font-size: 13px;
-}
-.profile-logo-accent {
-  color: #4e9dc4;
-}
-.profile-search {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  flex: 1;
-  max-width: 520px;
-  padding: 10px 14px 10px 24px;
-  border: 1px solid #dedfdc;
-  border-radius: 8px;
-  box-shadow: 0 1px 8px #0002;
-}
-.profile-search input {
-  min-width: 0;
-  flex: 1;
-  background: transparent;
-  outline-offset: 3px;
-}
-.profile-search button {
-  width: 32px;
-  height: 32px;
-  border-radius: 3px;
-  background: #1c465a;
-  color: white;
-  font-size: 23px;
-  line-height: 1;
-  cursor: pointer;
-}
-.profile-header-links {
-  margin-left: auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 22px;
-  font-weight: 600;
-}
-.profile-header-links a {
-  color: #20221f;
 }
 .profile-intro {
   background: #fff;
@@ -533,10 +465,6 @@
   .profile-shell {
     padding-inline: 32px;
   }
-  .profile-header-links {
-    gap: 14px;
-    font-size: 13px;
-  }
   .profile-columns {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -550,25 +478,6 @@
 @media (max-width: 640px) {
   .profile-shell {
     padding-inline: 20px;
-  }
-  .profile-header-row {
-    min-height: 64px;
-    gap: 18px;
-    flex-wrap: wrap;
-    padding-block: 14px;
-  }
-  .profile-search {
-    padding: 6px 8px 6px 12px;
-  }
-  .profile-header-links {
-    width: 100%;
-    justify-content: space-between;
-  }
-  .profile-logo {
-    font-size: 26px;
-  }
-  .profile-logo small {
-    font-size: 11px;
   }
   .profile-title-row {
     flex-direction: column;
@@ -635,27 +544,6 @@
 .guided-search-page :is(button, a, input, select):focus-visible {
   outline: 2px solid #549fbe;
   outline-offset: 3px;
-}
-.search-header {
-  border-bottom: 1px solid var(--color-line);
-}
-.search-header-row {
-  padding-inline: 28px;
-  min-height: 80px;
-}
-.search-header-form {
-  max-width: 620px;
-}
-.search-header-form button {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-}
-.search-my-list {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
 }
 .search-priorities {
   padding: 16px 28px;
@@ -797,79 +685,6 @@
   padding-inline: 24px;
   gap: 16px;
 }
-.search-school-card {
-  position: relative;
-  padding: 20px;
-  gap: 16px;
-  border-radius: 15px;
-  box-shadow: 0 1px 3px #0000000d;
-}
-.search-school-card-selected {
-  border-left: 3px solid #549fbe;
-  padding-left: 18px;
-}
-.search-school-illustration {
-  width: 112px;
-  height: 112px;
-  background: #e5ece7;
-}
-.search-school-illustration > svg {
-  width: 100%;
-  height: 100%;
-  opacity: .9;
-}
-.search-school-illustration > span {
-  padding: 1px 4px;
-  font-size: 9px;
-  color: #697360;
-}
-.search-school-illustration button {
-  border: 1px solid #e2e5da;
-  width: 30px;
-  height: 30px;
-}
-.search-school-name {
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: -.3px;
-}
-.search-school-name a {
-  color: #20221f;
-}
-.search-school-name a:hover {
-  color: #1c465a;
-  text-decoration: underline;
-}
-.search-school-content {
-  gap: 10px;
-}
-.search-school-reviews {
-  font-size: 12px;
-  color: #626b59;
-}
-.search-school-rating {
-  width: 48px;
-  height: 48px;
-  font-size: 22px;
-}
-.search-school-rating small {
-  font-size: 10px;
-  margin-top: 7px;
-}
-.search-school-evidence {
-  padding-block: 6px;
-  gap: 10px;
-}
-.search-school-actions {
-  border-top: 1px solid #e5e7dd;
-  padding-top: 14px;
-  gap: 10px 16px;
-  font-size: 12px;
-}
-.search-school-actions a:hover {
-  text-decoration: underline;
-}
 .search-feedback {
   font-size: 13px;
   padding-block: 12px;
@@ -893,26 +708,7 @@
 .guided-search-page .search-map-message li {
   margin-top: 12px;
 }
-@media (max-width: 1023px) {
-  .search-header-row {
-    flex-wrap: wrap;
-    padding-block: 16px;
-    gap: 16px;
-  }
-  .search-header-form {
-    max-width: none;
-  }
-  .search-header-row .profile-header-links {
-    width: 100%;
-    justify-content: space-between;
-    margin-left: 0;
-    font-size: 13px;
-  }
-}
 @media (max-width: 640px) {
-  .search-header-row {
-    padding-inline: 20px;
-  }
   .search-priorities {
     padding: 16px 20px;
     gap: 8px;
@@ -937,17 +733,620 @@
   .search-results-list {
     padding-inline: 16px;
   }
-  .search-school-card {
-    padding: 18px;
+}
+
+.gs-navbar {
+  position: relative;
+  z-index: 30;
+  flex-shrink: 0;
+  background: #fff;
+  border-bottom: 1px solid #e0e1da;
+  font-family: "Manrope", sans-serif;
+}
+.school-profile .gs-navbar {
+  position: sticky;
+  top: 0;
+}
+.gs-navbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 1280px;
+  min-height: 72px;
+  padding: 8px 64px;
+  margin-inline: auto;
+}
+.gs-navbar-logo {
+  display: block;
+  flex-shrink: 0;
+  width: 95px;
+  height: 40px;
+}
+.gs-navbar-logo img {
+  width: 95px;
+  height: 40px;
+}
+.gs-navbar-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  max-width: 520px;
+  padding: 10px 16px 10px 24px;
+  border: 1px solid #e5e5e0;
+  border-radius: 8px;
+  box-shadow: 0 1px 8px #0002;
+}
+.gs-navbar-search input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  font-size: 15px;
+}
+.gs-navbar-search button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  background: #1c465a;
+  color: #fff;
+  cursor: pointer;
+}
+.gs-navbar-search:focus-within {
+  border-color: #549fbe;
+}
+.gs-navbar-search input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.gs-navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 600;
+}
+.gs-navbar-links > a {
+  color: #20221f;
+}
+.gs-navbar-account {
+  position: relative;
+}
+.gs-navbar-account summary {
+  list-style: none;
+  cursor: pointer;
+  border-radius: 50%;
+}
+.gs-navbar-account summary::-webkit-details-marker {
+  display: none;
+}
+.gs-navbar-account > div {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px);
+  min-width: 150px;
+  padding: 14px 18px;
+  border: 1px solid #d9dbd4;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 18px #0002;
+}
+.gs-school-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  padding: 20px;
+  border: 1px solid #dedfd8;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 1px 4px #0000000d;
+  font-family: "Manrope", sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #20221f;
+}
+.gs-school-card[tabindex] {
+  cursor: pointer;
+}
+.gs-school-card.is-comparing {
+  border-color: #1a9dd1;
+  box-shadow: 0 0 0 2px #1a9dd1;
+}
+.gs-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.gs-card-heading > div:first-child {
+  min-width: 0;
+}
+.gs-card-heading h2 {
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 800;
+  color: #033e5c;
+}
+.gs-card-heading a:hover {
+  text-decoration: underline;
+}
+.gs-card-address {
+  margin-top: 4px;
+  color: #62645b;
+  font-size: 15px;
+}
+.gs-card-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #549fbe;
+  color: white;
+  font-size: 22px;
+  font-weight: 800;
+}
+.gs-card-rating small {
+  margin-top: 7px;
+  font-size: 10px;
+}
+.gs-card-unrated {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 56px;
+  min-height: 56px;
+  border: 1px dashed #959e93;
+  border-radius: 50%;
+  font-size: 10px;
+  text-align: center;
+  color: #6b7066;
+}
+.gs-card-reviews {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: -8px;
+  color: #62645b;
+}
+.gs-review-star {
+  color: #e6b24e;
+  font-size: 19px;
+}
+.gs-card-reviews a {
+  text-decoration: underline;
+}
+.gs-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin-top: 4px;
+}
+.gs-card-badges li {
+  padding: 3px 7px;
+  border-radius: 3px;
+  background: #f7f7f3;
+  font-size: 12px;
+  font-weight: 600;
+}
+.gs-card-factors {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gs-card-factors > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gs-card-factors dt {
+  order: 1;
+  font-size: 16px;
+}
+.gs-card-factors dd {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.gs-card-factors dd > span {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #fff;
+  background: #549fbe;
+  font-size: 11px;
+  font-weight: 800;
+}
+.gs-card-factors dd > small {
+  font-size: 10px;
+}
+.gs-card-highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  font-size: 14px;
+}
+.gs-card-highlight svg {
+  flex-shrink: 0;
+}
+.gs-card-evidence {
+  font-size: 13px;
+}
+.gs-card-evidence summary {
+  cursor: pointer;
+  color: #033e5c;
+  font-weight: 600;
+}
+.gs-card-evidence ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.gs-card-evidence > p {
+  margin-top: 10px;
+  color: #6b7066;
+  font-size: 11px;
+}
+.gs-card-evidence a {
+  text-decoration: underline;
+}
+.gs-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+.gs-card-save,
+.gs-card-profile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 6px 16px;
+  border: 1px solid #1c465a;
+  border-radius: 50px;
+  font-size: 12px;
+}
+.gs-card-save {
+  color: #fff;
+  background: #1c465a;
+  font-weight: 700;
+}
+.gs-card-save:disabled {
+  opacity: .45;
+}
+.gs-card-profile {
+  color: #20221f;
+  background: #fff;
+}
+.gs-card-profile > span {
+  font-size: 20px;
+  line-height: .8;
+}
+.gs-card-compare {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  font-size: 12px;
+  cursor: pointer;
+}
+.gs-card-compare input {
+  accent-color: #1a9dd1;
+  width: 16px;
+  height: 16px;
+}
+.gs-map-marker {
+  cursor: pointer;
+  pointer-events: auto;
+}
+button.gs-map-marker,
+div.gs-map-marker {
+  display: block;
+  width: 40px;
+  height: 50px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.gs-map-marker svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.gs-map-marker path {
+  fill: rgb(51 51 51 / .7);
+}
+.gs-map-marker circle {
+  fill: #1a9dd1;
+}
+.gs-map-marker text {
+  fill: #fff;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+}
+.gs-map-marker.is-selected circle,
+.gs-map-marker:hover circle {
+  fill: #fff;
+  stroke: #1a9dd1;
+  stroke-width: 3px;
+}
+.gs-map-marker.is-selected text,
+.gs-map-marker:hover text {
+  fill: #1a9dd1;
+}
+.guided-search-page .search-chat-form input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.search-chat-form:focus-within {
+  border-color: #549fbe;
+  box-shadow: 0 0 0 2px #b7d6e1;
+}
+@media (max-width: 1100px) {
+  .gs-navbar-inner {
+    padding-inline: 28px;
+    gap: 20px;
   }
-  .search-school-card-selected {
-    padding-left: 16px;
+  .gs-navbar-links {
+    gap: 16px;
+    font-size: 14px;
   }
-  .search-school-illustration {
-    width: 96px;
-    height: 96px;
+}
+@media (max-width: 760px) {
+  .gs-navbar-inner {
+    flex-wrap: wrap;
+    padding: 14px 20px;
+    gap: 16px;
   }
-  .search-school-content {
-    min-width: 100%;
+  .gs-navbar-search {
+    max-width: none;
+    padding: 8px 12px;
   }
+  .gs-navbar-links {
+    justify-content: space-between;
+    width: 100%;
+    margin-left: 0;
+    gap: 10px;
+    font-size: 12px;
+  }
+  .gs-navbar-logo,
+  .gs-navbar-logo img {
+    width: 82px;
+    height: auto;
+  }
+}
+
+.guide-identity {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  color: #6b7066;
+}
+.guide-welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.guide-eyebrow {
+  color: #477363;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.guide-welcome h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 29px;
+  line-height: 1.2;
+  color: #1c465a;
+}
+.guide-welcome > p {
+  font-size: 14px;
+  line-height: 1.75;
+  color: #555e50;
+}
+.guide-start-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.guide-start-form label {
+  font-size: 13px;
+  font-weight: 700;
+}
+.guide-start-form textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 14px;
+  border: 1px solid #b8cbbf;
+  border-radius: 12px;
+  background: #f8faf5;
+  resize: vertical;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.guide-start-form input[type="submit"] {
+  min-height: 42px;
+  border-radius: 50px;
+  color: #fff;
+  background: #1c465a;
+  font-size: 13px;
+  font-weight: 700;
+}
+.guide-welcome .guide-starter-label {
+  margin-bottom: -8px;
+  color: #6b7066;
+  font-size: 12px;
+}
+.guide-starters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.guide-starters button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid #d9e2d6;
+  border-radius: 10px;
+  text-align: left;
+  font-size: 13px;
+  color: #1c465a;
+  background: #f5f8f1;
+}
+.guide-starters button:hover {
+  background: #eaf1e5;
+  border-color: #9db5a6;
+}
+.guide-welcome .guide-demo-note {
+  color: #7c8375;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.guide-response {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.search-chat #messages {
+  overflow-anchor: none;
+  overscroll-behavior: contain;
+}
+.guide-pending-message {
+  align-self: flex-end;
+  max-width: 290px;
+  border-radius: 16px 16px 2px 16px;
+  background: #eef1f4;
+  padding: 12px 16px;
+  font-size: 15px;
+}
+.guide-thinking {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+.guide-thinking-dots { display: flex; gap: 4px; }
+.guide-thinking-dots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: guide-pulse 1.2s ease-in-out infinite;
+}
+.guide-thinking-dots i:nth-child(2) { animation-delay: .15s; }
+.guide-thinking-dots i:nth-child(3) { animation-delay: .3s; }
+.guide-response-new { animation: guide-arrive .2s ease-out; }
+@keyframes guide-pulse { 50% { opacity: .35; transform: translateY(-2px); } }
+@keyframes guide-arrive { from { opacity: .3; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .guide-thinking-dots i, .guide-response-new { animation: none; }
+}
+.guide-response-label {
+  color: #507460;
+  font-size: 11px;
+  font-weight: 700;
+}
+.guide-response p {
+  white-space: pre-line;
+  font-size: 14px;
+  line-height: 1.75;
+  color: #35412f;
+}
+.guide-spotlight {
+  padding: 14px;
+  border: 1px solid #dce4d6;
+  border-radius: 12px;
+  background: #f8faf5;
+}
+.guide-spotlight h3 {
+  margin-bottom: 8px;
+  color: #1c465a;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 800;
+}
+.guide-spotlight p {
+  font-size: 13px;
+}
+.guide-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #e4e8dc;
+  font-size: 11px;
+}
+.guide-sources > span {
+  width: 100%;
+  color: #6b7066;
+}
+.guide-sources a {
+  color: #1c465a;
+  text-decoration: underline;
+}
+.guide-next {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+}
+.guide-next > p {
+  width: 100%;
+  margin-bottom: 2px;
+  color: #6b7066;
+  font-size: 12px;
+}
+.guide-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid #bed2c3;
+  border-radius: 20px;
+  color: #1c465a;
+  background: #f2f7ee;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+.guide-action:hover {
+  border-color: #749984;
+  background: #e6efe0;
+}
+.gs-card-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e8ebdf;
+}
+.guided-search-page .search-chat-form textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
 }

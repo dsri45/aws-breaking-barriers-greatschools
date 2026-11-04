@@ -30,7 +30,7 @@ module Api
         return school_profile_path(params[:school_id])
       end
 
-      params[:view] == "shortlist" ? root_path(view: "shortlist") : root_path
+      search_return_path(view: ("shortlist" if params[:view] == "shortlist"))
     end
 
     def disable_caching
@@ -38,8 +38,7 @@ module Api
     end
 
     def current_search_session
-      @current_search_session ||= stored_search_session ||
-        SearchSession.create!.tap { |search_session| session[:guided_search_id] = search_session.id }
+      @current_search_session ||= stored_search_session || activate_search_session(browser_search_sessions.create!)
     end
   end
 end

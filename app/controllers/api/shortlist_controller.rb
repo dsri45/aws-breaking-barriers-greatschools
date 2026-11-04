@@ -8,7 +8,7 @@ module Api
       entry = entries.find_by(school_id: params[:school_id])
       return respond_with_school(entry) if entry
 
-      school = search_session.results.find { |result| (result["id"] || result["school_id"]).to_s == params[:school_id] }
+      school = search_session.matching_results.find { |result| (result["id"] || result["school_id"]).to_s == params[:school_id] }
       unless school
         return render_error("school_not_in_results", :not_found, "That school is no longer in your search results.")
       end

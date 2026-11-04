@@ -4,5 +4,6 @@ Rails.application.configure do
   config.consider_all_requests_local = true
   config.action_controller.allow_forgery_protection = true
   config.action_dispatch.show_exceptions = :rescuable
+  config.cache_store = :memory_store
   config.active_support.deprecation = :stderr
 end

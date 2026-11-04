@@ -32,24 +32,30 @@ module GuidedSearch
       size = (prefs["size"] || DEFAULT_SIZE).to_i
 
       filters = symbolize(prefs["filters"])
-      required_keys = criteria.select { |criterion| criterion["importance"] == "require" }.pluck("key") - %w[level location]
+      required_keys = EvidenceScorer.required_keys(criteria)
+      preferred_keys = criteria.select { |criterion| criterion["importance"] == "prefer" }.pluck("key") - %w[level location]
+      filters[:ib_offered] = true if (required_keys & %w[ib ib_offered]).any?
+      filters[:reading_club] = true if required_keys.include?("reading_club")
       hits = @school_search.search(
         text: prefs["query"].to_s,
         filters: filters,
         geo: geo,
-        size: required_keys.empty? ? size : size * GuidedSearch::SchoolSearch::CANDIDATE_MULTIPLIER
+        size: criteria.empty? ? size : size * GuidedSearch::SchoolSearch::CANDIDATE_MULTIPLIER
       )
 
       # Thread the requested grade level into evidence scoring so a "middle
       # school" requirement reads correctly against each school's level_codes.
       context = { level: filters[:level_codes] }.compact
-      cards = hits.lazy.map { |hit| card(hit, criteria, geo, context) }
-      return cards.first(size) if required_keys.empty?
-
-      cards.select do |result|
-        confirmed_keys = result["criteria"].select { |evidence| evidence["status"] == "confirmed" }.pluck("key")
-        (required_keys - confirmed_keys).empty?
-      end.first(size)
+      cards = hits.map { |hit| card(hit, criteria, geo, context) }.select do |result|
+        EvidenceScorer.matches?(criteria: criteria, evidence: result["criteria"])
+      end
+      ranked = cards.each_with_index.sort_by do |result, index|
+        matches = result["criteria"].count do |evidence|
+          preferred_keys.include?(evidence["key"]) && evidence["status"] == "confirmed"
+        end
+        [-matches, index]
+      end
+      ranked.first(size).map(&:first)
     end
 
     private

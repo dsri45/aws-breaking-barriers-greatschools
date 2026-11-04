@@ -1,0 +1,22 @@
+<div class="guide-welcome">
+  <span class="guide-eyebrow">Your AI school guide</span>
+  <h3>Let's get to know your learner.</h3>
+  <p>Tell me where you're looking, your child's grade, and what helps them learn best. We'll look at school strengths, everyday fit, and questions worth taking on a visit.</p>
+  <%= form_with url: api_search_path(format: :html), data: { turbo_frame: "guided-search", turbo_action: "replace" }, class: "guide-start-form" do |form| %>
+    <%= form.label :message, "What matters to your family?", for: "follow_up_message" %>
+    <%= form.text_area :message, id: "follow_up_message", rows: 3, required: true, maxlength: 2000,
+          placeholder: "Tell me your city or ZIP, your child's grade, and what you're looking for…" %>
+    <%= form.submit "Find schools together →", data: { turbo_submits_with: "Looking at schools…" } %>
+  <% end %>
+  <p class="guide-starter-label">A few ways to start</p>
+  <div class="guide-starters">
+    <% [
+      ["Academic fit", "Help me find a highly rated school that fits my child."],
+      ["Sports and activities", "I'm looking for a school with sports programs and after-school clubs."],
+      ["Help me choose", "I'm not sure which school priorities matter most yet. Help me think it through."]
+    ].each do |label, prompt| %>
+      <button type="button" data-action="chat-prompts#fill" data-chat-prompts-message-param="<%= prompt %>"><%= label %><span aria-hidden="true">↗</span></button>
+    <% end %>
+  </div>
+  <p class="guide-demo-note">No location or grade is selected. Edit a starter to make the search your own.</p>
+</div>

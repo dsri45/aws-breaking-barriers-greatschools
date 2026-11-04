@@ -6,14 +6,17 @@ module GuidedSearch
       "Career preparation" => "career_prep",
       "Gifted and Talented program" => "gifted_talented",
       "Highly rated" => "rating",
+      "IB offered" => "ib",
       "Positive reviews" => "reviews",
+      "Reading club" => "reading_club",
       "Small class sizes" => "class_size",
+      "Sports programs" => "sports_programs",
       "Transportation options" => "transportation"
     }.freeze
 
     def self.criterion_for(need)
       { "key" => EVIDENCE_KEYS.fetch(need) { need.parameterize(separator: "_") },
-        "label" => need, "importance" => "prefer" }
+        "label" => need, "importance" => "require" }
     end
 
     def initialize(extractor: NeedsExtractor.new)
@@ -46,15 +49,9 @@ module GuidedSearch
 
     def reply(guidance:, results:)
       if guidance.fetch(:search)
-        if results.empty?
-          location = guidance.dig(:preferences, "location")
-          return "I couldn’t find matching schools for #{location} in the current dataset. Try a different city or ZIP code."
-        end
-        return "I found one school to explore." if results.one?
-
-        "I found #{results.size} schools to explore."
+        SchoolGuide.recommendations(preferences: guidance.fetch(:preferences), results: results)
       else
-        guidance.fetch(:follow_up_questions).first
+        "Happy to help. Let's build this around your learner. #{guidance.fetch(:follow_up_questions).first}"
       end
     end
   end

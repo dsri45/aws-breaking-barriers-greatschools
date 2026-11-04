@@ -1,0 +1,42 @@
+<% content_for :title, "Chat history" %>
+<div class="min-h-dvh bg-ground">
+  <%= render "shared/navigation", search_frame: "_top", search_value: nil, shortlist_count: nil %>
+  <main class="mx-auto max-w-3xl px-5 py-8">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-navy">Your school searches</h1>
+        <p class="mt-2 text-sm text-muted">Pick up where you left off, or start fresh.</p>
+      </div>
+      <%= button_to "+ New chat", chats_path, class: "rounded-full bg-navy px-5 py-3 text-sm font-semibold text-white" %>
+    </div>
+    <p class="mb-6 text-sm text-muted">Chat history is available to this browser for 30 days after your last visit. Keep its cookies to resume your searches. Each chat keeps its own priorities and saved schools.</p>
+    <% if @chats.empty? %>
+      <div class="rounded-2xl border border-line bg-white p-6">
+        <h2 class="font-semibold text-navy">Your next search starts here</h2>
+        <p class="mt-2 text-sm text-muted">Send your first message and this chat will appear in your history.</p>
+      </div>
+    <% else %>
+      <ul class="flex flex-col gap-3">
+        <% @chats.each do |chat| %>
+          <li class="rounded-2xl border border-line bg-white p-5">
+            <div class="flex items-start justify-between gap-4">
+              <div class="min-w-0">
+                <h2 class="break-words font-semibold text-navy"><%= truncate(chat.title, length: 140) %></h2>
+                <p class="mt-2 text-sm text-muted"><%= [chat.preferences["location"], chat.preferences["grade_level"]].compact_blank.join(" · ").presence || "Exploring school fit" %></p>
+                <p class="mt-2 text-xs text-muted">Updated <time datetime="<%= chat.updated_at.iso8601 %>"><%= chat.updated_at.strftime("%b %-d, %Y at %H:%M %Z") %></time><%= " · Current chat" if chat.id == @active_chat&.id %></p>
+              </div>
+              <%= link_to "Resume", chat_path(chat.id), class: "shrink-0 rounded-full border border-line-2 px-4 py-2 text-sm font-semibold text-blue", aria: { label: "Resume #{truncate(chat.title, length: 80)}" } %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+      <% if @total_pages > 1 %>
+        <nav aria-label="Chat history pages" class="mt-6 flex items-center justify-between text-sm font-semibold text-blue">
+          <span><%= link_to "Previous", chats_path(page: @page - 1) if @page > 1 %></span>
+          <span class="text-muted">Page <%= @page %> of <%= @total_pages %></span>
+          <span><%= link_to "Next", chats_path(page: @page + 1) if @page < @total_pages %></span>
+        </nav>
+      <% end %>
+    <% end %>
+  </main>
+</div>

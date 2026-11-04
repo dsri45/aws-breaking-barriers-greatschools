@@ -3,6 +3,8 @@ module GuidedSearch
     ANY_GRADE = "Any grade"
     ANY_GRADE_REPLY = /\A(?:any|all) grades?(?: levels?)?(?: (?:is|are) fine)?[.!]?\z/i
     NO_PREFERENCE_REPLY = /\A(?:any|anything|no preference|(?:it )?doesn['’]t matter)[.!]?\z/i
+    GRADE_NAMES = { "p" => "Preschool", "e" => "Elementary school", "m" => "Middle school", "h" => "High school" }.freeze
+    READING_CLUB = /\b(?:reading|book|literacy)\s+clubs?\b/i
 
     NEEDS = [
       "Advanced coursework access",
@@ -36,6 +38,7 @@ module GuidedSearch
       "Positive culture",
       "Positive reviews",
       "Reasonable homework load",
+      "Reading club",
       "Resources and supports",
       "Safe environment",
       "Schedule compatibility",
@@ -72,13 +75,20 @@ module GuidedSearch
         guided school discovery agent.
 
         Identify the parent's school preferences using ONLY
-        these official GreatSchools needs:
+        these supported needs and specific activities:
 
         #{NEEDS.join(", ")}
 
         Rules:
         - Use exact need names from the list.
         - Do not invent preferences.
+        - Keep named activities specific. Reading clubs, book clubs, and literacy
+          clubs map to "Reading club", never to "Arts programs" or to general
+          reading scores. Do not replace a requested activity with a related subject.
+          A club request does not imply after-school scheduling unless stated.
+        - Put the parent's explicitly requested activity first in needs.
+          Extract "Arts programs" only when the parent asks for arts or has
+          previously confirmed that preference. Extra suggestions are not preferences.
         - Preserve previously confirmed preferences unless
           the parent explicitly changes them.
         - Extract location and grade level separately.
@@ -86,6 +96,9 @@ module GuidedSearch
         - Identify important missing information.
         - Ask exactly one useful clarifying question, or null
           if no question is needed.
+        - Phrase questions in a warm, encouraging school-guide voice, like a
+          teacher helping a family explore options. You are an AI guide.
+          Do not claim personal teaching experience or visits to a school.
         - Return valid JSON only.
 
         JSON fields:
@@ -136,12 +149,14 @@ module GuidedSearch
       end
 
       result["needs"] = result["needs"].uniq
+      preserve_reading_club_request!(result, message, preferences)
       %w[location grade_level query clarifying_question].each do |key|
         value = result[key]
         value = "Grade #{value}" if key == "grade_level" && value.is_a?(Integer)
         result[key] = value.is_a?(String) ? value.strip.presence : nil
       end
       grade_level = result["grade_level"] || preferences["grade_level"].presence_in([ANY_GRADE])
+      grade_level = GRADE_NAMES.fetch(grade_level.to_s.downcase, grade_level)
       result["grade_level"] = ANY_GRADE_REPLY.match?(grade_level.to_s) ? ANY_GRADE : grade_level
       result["filters"] = filters_for(result["filters"], result["location"], result["grade_level"])
       result["missing_information"] = Array(result["missing_information"]).grep(String)
@@ -151,6 +166,28 @@ module GuidedSearch
     end
 
     private
+
+    def preserve_reading_club_request!(result, message, preferences)
+      mention = READING_CLUB.match(message)
+      return unless mention
+
+      prefix = message[0...mention.begin(0)].split(/[.!?;,]/).last.to_s
+      return if prefix.match?(/\b(?:no|not|without|don['’]t|doesn['’]t|avoid|exclude|remove)\b.{0,50}\z/i)
+
+      needs = result["needs"]
+      # A related subject must not silently replace the specific activity.
+      unless message.match?(/\b(?:art|arts|drawing|painting|visual arts)\b/i) || Array(preferences["needs"]).include?("Arts programs")
+        needs.delete("Arts programs")
+      end
+      unless message.match?(/\b(?:scores?|proficiency|literacy skills|reading skills|reading instruction|strong reading and writing)\b/i) || Array(preferences["needs"]).include?("Strong reading and writing")
+        needs.delete("Strong reading and writing")
+      end
+      unless message.match?(/\bafter[-\s]school\b|\bafter classes\b/i) || Array(preferences["needs"]).include?("After-school clubs")
+        needs.delete("After-school clubs")
+      end
+      result["needs"] = ["Reading club", *needs].uniq
+      result["query"] = [message, preferences["location"], preferences["grade_level"]].compact_blank.join(" · ")
+    end
 
     def any_grade_reply?(message, history)
       answer = message.strip
