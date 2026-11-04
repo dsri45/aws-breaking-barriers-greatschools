@@ -20,18 +20,7 @@ The 25-school sample in `db/seeds/school_data.json` is Florida-only. Queries tha
 
 There is no CodePipeline, API Gateway, or Lambda app tier. CDK deploys CloudFormation stack `GreatSchoolsGuidedSearch` in `us-east-1`.
 
-```mermaid
-flowchart LR
-  Viewer["Allowed viewer CIDR"] --> WAF["WAFv2"]
-  WAF --> CF["CloudFront HTTPS"]
-  CF --> Origin["VPC origin"]
-  Origin --> ALB["Internal ALB :80"]
-  ALB --> EC2["EC2 t3.small<br/>nginx + Rails"]
-  EC2 --> RDS["RDS MySQL 8.4"]
-  EC2 --> OS["OpenSearch 2.19"]
-  EC2 --> Bedrock["Bedrock Nova Pro"]
-  EC2 --> SSM["SSM + Secrets Manager"]
-```
+![AWS architecture: WAF and CloudFront in front of a VPC origin to an internal ALB, EC2 Rails, OpenSearch, RDS, and Bedrock](docs/architecture.png)
 
 | Service | Role |
 | --- | --- |
